@@ -20,26 +20,11 @@ const MobileHero = dynamic(() => import('@/components/MobileHero'), { ssr: false
 const displayedServices = services.slice(0, 6)
 
 export default function Home() {
-  const heroTextRef = useRef<HTMLDivElement>(null)
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const processRef = useRef<HTMLDivElement>(null)
   const icpRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (heroTextRef.current) {
-      gsap.fromTo(
-        heroTextRef.current.children,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.9, stagger: 0.2, ease: 'power3.out', delay: 0.4 }
-      )
-    }
-
-    if (scrollIndicatorRef.current) {
-      gsap.to(scrollIndicatorRef.current, {
-        y: 8, duration: 1.2, ease: 'power1.inOut', repeat: -1, yoyo: true
-      })
-    }
-
     if (processRef.current) {
       gsap.fromTo(
         processRef.current.querySelectorAll('.process-item'),
@@ -82,54 +67,24 @@ export default function Home() {
     <main className="min-h-screen" style={{ background: '#F5F3EF' }}>
       <Nav />
 
-      {/* HERO */}
-      <section
-        className="relative w-full overflow-hidden"
-        style={{ height: '100svh', minHeight: 600, background: '#0F0E0C' }}
-      >
-        <div className="hidden md:block absolute inset-0">
-          <ParticleVortex />
-        </div>
-        <div className="md:hidden absolute inset-0">
-          <MobileHero />
-        </div>
-
-        <div className="hidden md:flex absolute inset-0 flex-col items-center justify-center text-center pointer-events-none">
-          <div ref={heroTextRef}>
-            <p
-              className="text-xs tracking-[0.3em] font-semibold uppercase mb-6"
-              style={{ color: '#FF9E1B', opacity: 0 }}
-            >
-              Digital Pointes
-            </p>
-            <h1
-              className="text-5xl lg:text-7xl font-bold leading-tight mb-5"
-              style={{ color: '#F5F3EF', opacity: 0 }}
-            >
-              You can't close a click.
-            </h1>
-            <p
-              className="text-lg lg:text-xl tracking-wide"
-              style={{ color: 'rgba(232,228,220,0.65)', opacity: 0 }}
-            >
-              Meaningful, measurable marketing.
-            </p>
+      {/* HERO — scroll-driven sticky container */}
+      <div ref={scrollContainerRef} style={{ height: '700vh' }}>
+        <div
+          style={{
+            position: 'sticky', top: 0,
+            height: '100svh', minHeight: 600,
+            background: '#0F0E0C',
+            overflow: 'hidden',
+          }}
+        >
+          <div className="hidden md:block h-full">
+            <ParticleVortex containerRef={scrollContainerRef} />
+          </div>
+          <div className="md:hidden h-full">
+            <MobileHero />
           </div>
         </div>
-
-        <div
-          ref={scrollIndicatorRef}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
-        >
-          <p className="text-xs tracking-[0.2em] uppercase" style={{ color: 'rgba(232,228,220,0.35)' }}>
-            Scroll
-          </p>
-          <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
-            <rect x="1" y="1" width="14" height="22" rx="7" stroke="rgba(232,228,220,0.25)" strokeWidth="1.5" />
-            <rect x="6.5" y="5" width="3" height="6" rx="1.5" fill="rgba(255,158,27,0.6)" />
-          </svg>
-        </div>
-      </section>
+      </div>
 
       {/* POSITIONING */}
       <section className="px-6 md:px-10 py-24 border-b" style={{ borderColor: 'rgba(26,25,23,0.08)' }}>

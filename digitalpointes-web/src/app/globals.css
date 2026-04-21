@@ -103,6 +103,15 @@ body {
   border-bottom-color: var(--dp-orange);
 }
 
+/* Scroll hint bounce */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0) translateX(-50%); }
+  50%       { transform: translateY(8px) translateX(-50%); }
+}
+.scroll-hint-bounce {
+  animation: scrollBounce 1.4s ease-in-out infinite;
+}
+
 /* Mobile CSS particle animation */
 @keyframes floatBit {
   0%   { transform: translateY(0) scale(1); opacity: 0.6; }
