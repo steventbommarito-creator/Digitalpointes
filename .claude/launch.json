@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "digitalpointes",
-      "runtimeExecutable": "bash",
-      "runtimeArgs": ["-c", "cd digitalpointes-web && npm run dev"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
       "port": 3000
     }
   ]
