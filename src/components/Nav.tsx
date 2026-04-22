@@ -25,17 +25,14 @@ export default function Nav() {
       <header
         className="fixed top-0 left-0 right-0 z-40 transition-all duration-300"
         style={{
-          background: scrolled ? 'rgba(245,243,239,0.82)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(14px) saturate(1.2)' : 'none',
-          borderBottom: scrolled ? '1px solid var(--line)' : '1px solid transparent',
+          background: 'var(--white-warm)',
+          backdropFilter: 'none',
+          borderBottom: '1px solid var(--line)',
         }}
       >
         <div className="container-x max-w-[1400px] mx-auto h-[72px] flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <Image src={LOGO_URL} alt="Digital Pointes" width={36} height={36} unoptimized priority className="h-9 w-auto" />
-            <span className="font-bold tracking-tight text-[17px] hidden sm:inline" style={{ color: 'var(--ink)' }}>
-              Digital Pointes
-            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
