@@ -17,7 +17,7 @@ export default function ServicePageTemplate({ service }: Props) {
       <Nav />
 
       {/* Hero */}
-      <section className="relative section-pad pt-[140px] container-x max-w-[1400px] mx-auto">
+      <section className="relative pt-[120px] pb-12 md:pb-16 container-x max-w-[1400px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
           <div className="lg:col-span-8">
             <Link
@@ -53,14 +53,14 @@ export default function ServicePageTemplate({ service }: Props) {
       </section>
 
       {/* Expanded copy */}
-      <section className="section-pad-sm container-x max-w-[1100px] mx-auto">
+      <section className="py-10 md:py-14 container-x max-w-[1100px] mx-auto">
         <p className="text-[18px] md:text-[20px] leading-[1.6]" style={{ color: 'var(--ink-soft)' }}>
           {service.expandedCopy}
         </p>
       </section>
 
       {/* Benefits */}
-      <section className="section-pad-sm container-x max-w-[1400px] mx-auto">
+      <section className="py-10 md:py-14 container-x max-w-[1400px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-4">
             <p className="eyebrow mb-4">What it delivers</p>
@@ -82,7 +82,7 @@ export default function ServicePageTemplate({ service }: Props) {
       </section>
 
       {/* Differentiator */}
-      <section className="section-pad-sm container-x max-w-[1400px] mx-auto">
+      <section className="py-10 md:py-14 container-x max-w-[1400px] mx-auto">
         <div
           className="p-8 md:p-14 rounded-2xl grid grid-cols-1 md:grid-cols-12 gap-8 items-center"
           style={{ background: 'var(--ink)', color: 'var(--white-warm)' }}
@@ -95,7 +95,7 @@ export default function ServicePageTemplate({ service }: Props) {
       </section>
 
       {/* Related */}
-      <section className="section-pad container-x max-w-[1400px] mx-auto">
+      <section className="py-12 md:py-16 container-x max-w-[1400px] mx-auto">
         <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
           <div>
             <p className="eyebrow mb-3">Continue exploring</p>
@@ -125,7 +125,7 @@ export default function ServicePageTemplate({ service }: Props) {
       </section>
 
       {/* CTA */}
-      <section className="section-pad-sm container-x max-w-[1400px] mx-auto">
+      <section className="py-10 md:py-16 container-x max-w-[1400px] mx-auto">
         <div
           className="p-10 md:p-14 rounded-2xl text-center"
           style={{ background: 'var(--orange)' }}

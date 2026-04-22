@@ -47,17 +47,19 @@ export default function DataGrid() {
       }
     }
 
-    // Mouse
+    // Mouse — listen on window so overlapping elements don't swallow events
     const mouse = { x: -9999, y: -9999, active: false }
     const onMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect()
-      mouse.x = e.clientX - rect.left
-      mouse.y = e.clientY - rect.top
-      mouse.active = true
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      mouse.x = x
+      mouse.y = y
+      mouse.active = x >= 0 && y >= 0 && x <= width && y <= height
     }
     const onLeave = () => { mouse.active = false; mouse.x = -9999; mouse.y = -9999 }
-    canvas.addEventListener('mousemove', onMove)
-    canvas.addEventListener('mouseleave', onLeave)
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseleave', onLeave)
 
     // Data packets: a packet walks the grid for a short life, lighting dots orange
     type Packet = { i: number; j: number; life: number; max: number; dir: number }
@@ -172,8 +174,8 @@ export default function DataGrid() {
     return () => {
       cancelAnimationFrame(animId)
       window.removeEventListener('resize', onResize)
-      canvas.removeEventListener('mousemove', onMove)
-      canvas.removeEventListener('mouseleave', onLeave)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseleave', onLeave)
     }
   }, [])
 

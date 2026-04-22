@@ -152,11 +152,12 @@ export default function Home() {
               <p data-hero-stagger className="eyebrow mb-6">Digital Pointes · Est. Growth System</p>
               <h1
                 data-hero-stagger
-                className="display text-[52px] sm:text-[68px] md:text-[88px] lg:text-[104px] xl:text-[120px] mb-7"
+                className="display text-[38px] sm:text-[50px] md:text-[66px] lg:text-[82px] xl:text-[96px] mb-7"
                 style={{ color: 'var(--ink)' }}
               >
-                You can&apos;t<br />
-                close a <span className="text-gradient-orange">click.</span>
+                Growth is already<br />
+                in your <span className="text-gradient-orange">data.</span><br />
+                Most systems never find it.
               </h1>
               <p
                 data-hero-stagger
