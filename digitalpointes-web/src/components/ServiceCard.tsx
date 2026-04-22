@@ -1,96 +1,71 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-gsap.registerPlugin(ScrollTrigger)
-
-interface ServiceCardProps {
+interface Props {
   number: string
-  icon: string
   name: string
   description: string
   href: string
-  index: number
+  glyph: React.ReactNode
 }
 
-export default function ServiceCard({ number, icon, name, description, href, index }: ServiceCardProps) {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const fromLeft = index % 2 === 0
-
-  useEffect(() => {
-    const card = cardRef.current
-    if (!card) return
-
-    gsap.fromTo(
-      card,
-      { x: fromLeft ? -60 : 60, opacity: 0, rotateZ: fromLeft ? -1.5 : 1.5 },
-      {
-        x: 0,
-        opacity: 1,
-        rotateZ: 0,
-        duration: 0.75,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: card,
-          start: 'top 88%',
-          toggleActions: 'play none none none',
-        },
-      },
-    )
-
-    return () => {
-      ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === card) st.kill()
-      })
-    }
-  }, [fromLeft])
-
+export default function ServiceCard({ number, name, description, href, glyph }: Props) {
   return (
-    <div ref={cardRef} style={{ opacity: 0 }}>
-      <Link href={href} className="group block h-full">
+    <Link href={href} className="group block h-full">
+      <article className="card-surface h-full p-7 flex flex-col relative overflow-hidden">
+        {/* Data-bit decorative grid (background) */}
         <div
-          className="h-full p-7 rounded-lg border transition-all duration-300 group-hover:shadow-lg"
+          className="absolute inset-0 opacity-[0.06] pointer-events-none transition-opacity duration-500 group-hover:opacity-[0.11]"
           style={{
-            background: '#ECEAE4',
-            borderColor: 'rgba(26,25,23,0.08)',
-            borderLeftWidth: 3,
-            borderLeftColor: '#FF9E1B',
+            backgroundImage: 'radial-gradient(var(--ink) 1px, transparent 1px)',
+            backgroundSize: '18px 18px',
           }}
-        >
-          <div className="flex items-start justify-between mb-5">
-            <span
-              className="text-xs font-semibold tracking-[0.2em]"
-              style={{ color: '#FF9E1B' }}
-            >
-              {number}
-            </span>
-            <span className="text-2xl select-none">{icon}</span>
-          </div>
+        />
 
-          <h3
-            className="text-xl font-bold mb-3 leading-tight"
-            style={{ color: '#1A1917' }}
-          >
-            {name}
-          </h3>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: '#6B6860' }}>
-            {description}
-          </p>
-
+        <div className="relative flex items-start justify-between mb-8">
+          <span className="num-mono text-[13px] tracking-widest" style={{ color: 'var(--muted)' }}>
+            / {number}
+          </span>
           <div
-            className="flex items-center gap-2 text-sm font-semibold transition-all duration-200 group-hover:gap-3"
-            style={{ color: '#FF9E1B' }}
+            className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-500 group-hover:rotate-[12deg]"
+            style={{ background: 'var(--surface)', color: 'var(--ink)' }}
           >
-            <span>Explore</span>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            {glyph}
           </div>
         </div>
-      </Link>
-    </div>
+
+        <h3 className="relative text-[22px] md:text-[24px] font-bold leading-tight mb-3 tracking-tight" style={{ color: 'var(--ink)' }}>
+          {name}
+        </h3>
+        <p className="relative text-[14.5px] leading-relaxed mb-8 flex-1" style={{ color: 'var(--muted)' }}>
+          {description}
+        </p>
+
+        <div className="relative flex items-center justify-between pt-5 border-t" style={{ borderColor: 'var(--line)' }}>
+          <span className="text-[13px] font-semibold" style={{ color: 'var(--ink)' }}>
+            Explore capability
+          </span>
+          <span
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 group-hover:translate-x-1"
+            style={{ background: 'var(--ink)', color: 'var(--white-warm)' }}
+          >
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+              <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </div>
+
+        {/* Orange accent line (reveals on hover) */}
+        <span
+          className="absolute left-0 top-0 h-[2px] bg-[var(--orange)] transition-all duration-500"
+          style={{ width: 0 }}
+          data-accent
+        />
+        <style jsx>{`
+          article:hover > [data-accent] { width: 100%; }
+        `}</style>
+      </article>
+    </Link>
   )
 }

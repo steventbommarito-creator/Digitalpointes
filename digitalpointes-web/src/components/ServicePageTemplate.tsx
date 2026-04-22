@@ -1,145 +1,149 @@
 import Link from 'next/link'
 import Nav from './Nav'
 import Footer from './Footer'
-import type { Service } from '@/lib/services'
+import { services, type Service } from '@/lib/services'
 
 interface Props {
   service: Service
 }
 
 export default function ServicePageTemplate({ service }: Props) {
+  const idx    = services.findIndex(s => s.slug === service.slug)
+  const number = String(idx + 1).padStart(2, '0')
+  const related = services.filter(s => s.slug !== service.slug).slice(0, 3)
+
   return (
-    <div className="min-h-screen" style={{ background: '#F5F3EF' }}>
+    <main className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <Nav />
 
       {/* Hero */}
-      <section
-        className="relative flex items-end pt-32 pb-16 px-6 md:px-10 overflow-hidden"
-        style={{ background: '#0F0E0C', minHeight: '52vh' }}
-      >
-        {/* Background texture - subtle grid */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `repeating-linear-gradient(0deg, #FF9E1B 0, #FF9E1B 1px, transparent 1px, transparent 60px),
-                              repeating-linear-gradient(90deg, #FF9E1B 0, #FF9E1B 1px, transparent 1px, transparent 60px)`,
-          }}
-        />
+      <section className="relative section-pad pt-[140px] container-x max-w-[1400px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+          <div className="lg:col-span-8">
+            <Link
+              href="/#services"
+              className="inline-flex items-center gap-2 text-[13px] font-medium mb-8 link-underline"
+              style={{ color: 'var(--muted)' }}
+            >
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M13 7H1M6 12L1 7l5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              All capabilities
+            </Link>
 
-        <div className="relative max-w-4xl">
-          <p
-            className="text-xs tracking-[0.25em] font-semibold uppercase mb-4"
-            style={{ color: '#FF9E1B' }}
-          >
-            {service.shortName}
-          </p>
-          <h1
-            className="text-4xl md:text-6xl font-bold leading-tight mb-6"
-            style={{ color: '#F5F3EF' }}
-          >
-            {service.heroStatement}
-          </h1>
-          <p className="text-lg md:text-xl max-w-2xl" style={{ color: 'rgba(232,228,220,0.70)' }}>
-            {service.tagline}
-          </p>
+            <p className="eyebrow mb-6">Capability / {number}</p>
+            <h1 className="display text-[48px] md:text-[72px] lg:text-[88px] mb-8" style={{ color: 'var(--ink)' }}>
+              {service.name}
+            </h1>
+            <p className="text-[20px] md:text-[24px] font-medium leading-snug max-w-2xl" style={{ color: 'var(--ink)' }}>
+              {service.heroStatement}
+            </p>
+          </div>
+
+          <div className="lg:col-span-4">
+            <div
+              className="p-6 rounded-2xl border"
+              style={{ background: 'var(--white-warm)', borderColor: 'var(--line)' }}
+            >
+              <p className="eyebrow mb-3">Core message</p>
+              <p className="text-[18px] font-semibold leading-snug" style={{ color: 'var(--ink)' }}>
+                {service.coreMessage}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Core message */}
-      <section className="px-6 md:px-10 py-20 border-b" style={{ borderColor: 'rgba(26,25,23,0.08)' }}>
-        <div className="max-w-4xl mx-auto">
-          <p
-            className="text-2xl md:text-3xl font-bold leading-snug mb-8"
-            style={{ color: '#1A1917' }}
-          >
-            {service.coreMessage}
-          </p>
-          <p className="text-base md:text-lg leading-relaxed max-w-3xl" style={{ color: '#6B6860' }}>
-            {service.expandedCopy}
-          </p>
-        </div>
+      {/* Expanded copy */}
+      <section className="section-pad-sm container-x max-w-[1100px] mx-auto">
+        <p className="text-[18px] md:text-[20px] leading-[1.6]" style={{ color: 'var(--ink-soft)' }}>
+          {service.expandedCopy}
+        </p>
       </section>
 
       {/* Benefits */}
-      <section className="px-6 md:px-10 py-20">
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
-          <div>
-            <p
-              className="text-xs tracking-[0.2em] font-semibold uppercase mb-8"
-              style={{ color: '#FF9E1B' }}
-            >
-              What you get
-            </p>
-            <ul className="space-y-5">
-              {service.bullets.map((b, i) => (
-                <li key={i} className="flex items-start gap-4">
-                  <span
-                    className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    style={{ background: '#FF9E1B' }}
-                  />
-                  <span className="text-base leading-relaxed" style={{ color: '#1A1917' }}>
-                    {b}
-                  </span>
-                </li>
-              ))}
-            </ul>
+      <section className="section-pad-sm container-x max-w-[1400px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-4">
+            <p className="eyebrow mb-4">What it delivers</p>
+            <h2 className="headline text-[32px] md:text-[40px]" style={{ color: 'var(--ink)' }}>
+              Outcomes, not activity.
+            </h2>
           </div>
-
-          <div
-            className="rounded-lg p-8 flex flex-col justify-between"
-            style={{ background: '#0F0E0C' }}
-          >
-            <div>
-              <p
-                className="text-xs tracking-[0.2em] font-semibold uppercase mb-5"
-                style={{ color: '#FF9E1B' }}
-              >
-                Why it's different
-              </p>
-              <p className="text-xl font-semibold leading-snug" style={{ color: '#E8E4DC' }}>
-                {service.differentiator}
-              </p>
-            </div>
-            <div className="mt-10">
-              <Link
-                href="/#contact"
-                className="inline-block px-6 py-3.5 rounded font-semibold text-sm transition-colors"
-                style={{ background: '#FF9E1B', color: '#0F0E0C' }}
-              >
-                Schedule a Strategy Call
-              </Link>
-            </div>
-          </div>
+          <ul className="lg:col-span-8 space-y-4">
+            {service.bullets.map((b) => (
+              <li key={b} className="flex items-start gap-4 pb-4 border-b" style={{ borderColor: 'var(--line)' }}>
+                <span className="data-bit mt-2.5 flex-shrink-0" />
+                <span className="text-[17px] md:text-[18px] font-medium" style={{ color: 'var(--ink)' }}>
+                  {b}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      {/* Back nav */}
-      <section
-        className="px-6 md:px-10 py-12 border-t"
-        style={{ borderColor: 'rgba(26,25,23,0.08)' }}
-      >
-        <div className="max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm font-semibold transition-colors hover:text-orange-500"
-            style={{ color: '#6B6860' }}
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M13 7H1M6 2L1 7l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Back to all services
+      {/* Differentiator */}
+      <section className="section-pad-sm container-x max-w-[1400px] mx-auto">
+        <div
+          className="p-8 md:p-14 rounded-2xl grid grid-cols-1 md:grid-cols-12 gap-8 items-center"
+          style={{ background: 'var(--ink)', color: 'var(--white-warm)' }}
+        >
+          <p className="eyebrow md:col-span-3" style={{ color: 'var(--orange)' }}>Why it&apos;s different</p>
+          <p className="md:col-span-9 text-[22px] md:text-[30px] font-semibold leading-[1.25] tracking-tight">
+            {service.differentiator}
+          </p>
+        </div>
+      </section>
+
+      {/* Related */}
+      <section className="section-pad container-x max-w-[1400px] mx-auto">
+        <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
+          <div>
+            <p className="eyebrow mb-3">Continue exploring</p>
+            <h2 className="headline text-[28px] md:text-[36px]" style={{ color: 'var(--ink)' }}>
+              Related capabilities
+            </h2>
+          </div>
+          <Link href="/#services" className="text-[14px] font-semibold link-underline">
+            See all capabilities
           </Link>
-          <Link
-            href="/#contact"
-            className="text-sm font-semibold transition-colors"
-            style={{ color: '#FF9E1B' }}
-          >
-            Ready to talk? Schedule a call →
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {related.map((r) => (
+            <Link key={r.slug} href={`/${r.slug}`} className="card-surface p-6 group">
+              <p className="num-mono text-[12px] tracking-widest mb-5" style={{ color: 'var(--muted)' }}>
+                / {String(services.findIndex(s => s.slug === r.slug) + 1).padStart(2, '0')}
+              </p>
+              <h3 className="text-[18px] font-bold mb-2 tracking-tight" style={{ color: 'var(--ink)' }}>
+                {r.shortName}
+              </h3>
+              <p className="text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                {r.tagline}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="section-pad-sm container-x max-w-[1400px] mx-auto">
+        <div
+          className="p-10 md:p-14 rounded-2xl text-center"
+          style={{ background: 'var(--orange)' }}
+        >
+          <h2 className="display text-[32px] md:text-[48px] mb-3" style={{ color: 'var(--ink)' }}>
+            Ready to put this to work?
+          </h2>
+          <p className="text-[16px] md:text-[18px] mb-7 max-w-xl mx-auto" style={{ color: 'rgba(15,14,12,0.72)' }}>
+            A working session to evaluate what&apos;s working, what&apos;s not, and where the biggest opportunities are.
+          </p>
+          <Link href="/#contact" className="btn-primary">
+            Schedule a Strategy Call
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </Link>
         </div>
       </section>
 
       <Footer />
-    </div>
+    </main>
   )
 }
