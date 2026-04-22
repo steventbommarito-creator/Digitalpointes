@@ -16,7 +16,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 const DataGrid = dynamic(() => import('@/components/DataGrid'), { ssr: false })
 
-const PULSE_GIF     = 'https://res.cloudinary.com/dank2mflu/image/upload/v1776735067/DP_Pulsing_omaq2i.gif'
+const PULSE_GIF     = 'https://res.cloudinary.com/dank2mflu/image/upload/e_make_transparent:30/v1776735067/DP_Pulsing_omaq2i.gif'
 const IMG_LAUGHING  = 'https://res.cloudinary.com/dank2mflu/image/upload/v1776735065/Laughing_woman_muup6e.png'
 const IMG_LAPTOP    = 'https://res.cloudinary.com/dank2mflu/image/upload/v1776735212/Girl_with_Laptop_a1aabn.png'
 
@@ -27,9 +27,9 @@ const INDUSTRIES = [
 ]
 
 const APPROACH = [
-  { num: '01', title: 'Start with the business',   body: 'How you win, where you lose, who your best customers really are — before we touch a channel.' },
+  { num: '01', title: 'Start with the business',   body: 'How you win, where you lose, who your best customers really are, before we touch a channel.' },
   { num: '02', title: 'Build the audience first',  body: 'First-party signals, enrichment, location intelligence. Targeting starts with knowing who, not guessing who.' },
-  { num: '03', title: 'Activate across the stack', body: 'Digital, direct mail, CTV, AI receptionists, automated workflows — coordinated, not fragmented.' },
+  { num: '03', title: 'Activate across the stack', body: 'Digital, direct mail, CTV, AI receptionists, automated workflows. Coordinated, not fragmented.' },
   { num: '04', title: 'Measure outcomes, not noise', body: 'Pipeline, revenue, qualified opportunity. Clicks and impressions are a means, not the scoreboard.' },
 ]
 
@@ -40,7 +40,7 @@ const STATS = [
   { value: '0',    label: 'Generic playbooks' },
 ]
 
-// Compact SVG glyphs per service — consistent visual language
+// Compact SVG glyphs per service
 const GLYPHS: Record<string, React.ReactNode> = {
   'visitor-identity': (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M1 10s3-6 9-6 9 6 9 6-3 6-9 6-9-6-9-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.6" fill="currentColor"/></svg>
@@ -164,7 +164,7 @@ export default function Home() {
                 style={{ color: 'var(--muted)' }}
               >
                 We build audience intelligence, activation systems, and growth engines that deliver
-                measurable outcomes — not just activity.
+                measurable outcomes. Not just activity.
               </p>
               <div data-hero-stagger className="flex flex-wrap items-center gap-3">
                 <Link href="#contact" className="btn-orange">
@@ -283,13 +283,13 @@ export default function Home() {
           </div>
           <div className="lg:col-span-7 space-y-6">
             <p className="reveal text-[17px] md:text-[19px] leading-[1.6]" style={{ color: 'var(--ink-soft)' }}>
-              Businesses see clicks, impressions, traffic, and reports — but still struggle to answer
+              Businesses see clicks, impressions, traffic, and reports. They still struggle to answer
               the only questions that matter: Is this bringing in qualified opportunities? Is this
               actually driving growth?
             </p>
             <p className="reveal text-[17px] md:text-[19px] leading-[1.6]" style={{ color: 'var(--ink-soft)' }}>
-              Digital Pointes starts with the business itself — how it wins, where it loses, who
-              its best customers are — then builds and activates audiences in a way that&apos;s
+              Digital Pointes starts with the business itself: how it wins, where it loses, who
+              its best customers are. Then it builds and activates audiences in a way that&apos;s
               connected, measurable, and grounded in business reality.
             </p>
             <div className="reveal pl-5 border-l-2 text-[17px] md:text-[19px] font-semibold leading-snug mt-8"
@@ -330,7 +330,7 @@ export default function Home() {
           <div className="lg:col-span-5 lg:pl-8 reveal">
             <p className="text-[15px] md:text-[17px] leading-[1.6]" style={{ color: 'var(--muted)' }}>
               These aren&apos;t isolated services. They&apos;re parts of a single system built to
-              identify, reach, and convert your best customers — with the full stack working in sync.
+              identify, reach, and convert your best customers, with the full stack working in sync.
             </p>
           </div>
         </div>
@@ -412,7 +412,7 @@ export default function Home() {
             </div>
             <div className="lg:col-span-6 lg:pl-10 flex items-end">
               <p className="text-[15px] md:text-[17px] leading-[1.65]" style={{ color: 'rgba(251,250,247,0.65)' }}>
-                Outcomes over activity. We don&apos;t defend campaigns — we improve them. The feedback loop is always on.
+                Outcomes over activity. We don&apos;t defend campaigns. We improve them. The feedback loop is always on.
               </p>
             </div>
           </div>
@@ -500,7 +500,7 @@ export default function Home() {
                 </p>
               </div>
               <p className="text-[14px] font-semibold leading-snug" style={{ color: 'var(--ink)' }}>
-                &ldquo;We replaced two agencies with one connected system — and the pipeline got stronger, not louder.&rdquo;
+                &ldquo;We replaced two agencies with one connected system. The pipeline got stronger, not louder.&rdquo;
               </p>
             </div>
           </div>

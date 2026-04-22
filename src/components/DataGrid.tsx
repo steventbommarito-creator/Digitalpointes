@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react'
  *  - react to the mouse (brighten + repel)
  *  - emit random orange "data packets" that propagate across the grid
  *
- * Designed to feel like the ambient pulse of a data network — not flashy.
+ * Designed to feel like the ambient pulse of a data network. Not flashy.
  */
 export default function DataGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -32,7 +32,7 @@ export default function DataGrid() {
     }
     resize()
 
-    // Grid setup — dot spacing adapts to viewport
+    // Grid setup: dot spacing adapts to viewport
     const SPACING = 26
     const cols = Math.ceil(width / SPACING) + 2
     const rows = Math.ceil(height / SPACING) + 2
