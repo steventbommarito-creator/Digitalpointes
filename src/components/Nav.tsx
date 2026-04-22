@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 
 const MobileMenu = dynamic(() => import('./MobileMenu'), { ssr: false })
 
-const LOGO_URL = 'https://res.cloudinary.com/dank2mflu/image/upload/v1776735064/dplogo_gk6n9o.png'
+const LOGO_URL = 'https://res.cloudinary.com/dank2mflu/image/upload/e_trim/v1776735064/dplogo_gk6n9o.png'
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -32,7 +32,7 @@ export default function Nav() {
       >
         <div className="container-x max-w-[1400px] mx-auto h-[72px] flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <Image src={LOGO_URL} alt="Digital Pointes" width={36} height={36} unoptimized priority className="h-9 w-auto" />
+            <Image src={LOGO_URL} alt="Digital Pointes" width={160} height={48} unoptimized priority className="h-10 w-auto" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
