@@ -439,7 +439,7 @@ export default function Home() {
 
           <p className="mt-16 text-[20px] md:text-[28px] font-semibold tracking-tight max-w-3xl" style={{ color: 'rgba(251,250,247,0.85)' }}>
             Most campaigns run until the budget runs out.{' '}
-            <span style={{ color: 'var(--orange)' }}>Ours evolve until they perform.</span>
+            <span style={{ color: 'var(--orange)' }}>Ours keep evolving, keep performing.</span>
           </p>
         </div>
       </section>

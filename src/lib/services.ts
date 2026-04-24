@@ -138,7 +138,7 @@ export const services: Service[] = [
       "Strategic Reddit engagement in high-intent communities",
       "Continuous improvement, not set-it-and-forget-it",
     ],
-    differentiator: "Most campaigns run until the budget runs out. Ours evolve until they perform.",
+    differentiator: "Most campaigns run until the budget runs out. Ours keep evolving, keep performing.",
     color: "#FF9E1B",
   },
   {
