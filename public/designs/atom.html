@@ -49,11 +49,45 @@ canvas#field{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-ind
 }
 .pill.show{opacity:1;transform:none}
 .pill:focus-visible{outline:3px solid var(--chalk);outline-offset:2px}
+/* ---------- scroll rail (section progress ruler) ---------- */
+#rail{
+  position:fixed;right:10px;top:50%;transform:translateY(-50%);z-index:35;
+  display:flex;flex-direction:column;align-items:flex-end;gap:6px;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+}
+#rail.show{opacity:1;pointer-events:auto}
+#rail .rt{display:block;border:0;padding:0;background:none}
+#rail .rt.minor{width:8px;height:2px;border-radius:1px;background:rgba(244,239,230,.22);transition:background .3s}
+#rail .rt.minor.on{background:rgba(255,158,27,.55)}
+#rail .rt.major{position:relative;width:18px;height:10px;background:transparent;cursor:pointer}
+#rail .rt.major::before{content:'';position:absolute;right:0;top:4px;width:100%;height:2px;border-radius:1px;background:rgba(244,239,230,.5);transition:background .3s}
+#rail .rt.major.on::before{background:var(--orange)}
+#rail .rt.major:hover::before,#rail .rt.major:focus-visible::before{background:var(--orange-glow)}
+#rail .rt.major:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+#rail .lbl{
+  position:absolute;right:28px;top:50%;transform:translateY(-50%);
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;
+  color:var(--chalk);background:rgba(18,21,27,.94);border:1px solid rgba(255,158,27,.35);
+  padding:4px 9px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+#rail .rt.major:hover .lbl,#rail .rt.major:focus-visible .lbl{opacity:1}
+#railDot{position:absolute;right:-7px;width:5px;height:5px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px rgba(255,158,27,.8);top:0;transition:top .15s linear}
+@media (max-width:640px){
+  #rail{right:6px;gap:4px}
+  #rail .rt.major{width:14px}
+  #rail .rt.minor{width:6px}
+}
 /* ---------- scenes ---------- */
 section.scene{
-  position:relative;z-index:10;min-height:100vh;
+  position:relative;z-index:10;
+  height:var(--rw,220vh);
+  pointer-events:none;
+}
+.scene .pin{
+  position:sticky;top:0;
+  height:100vh;height:100svh;
   display:flex;flex-direction:column;justify-content:flex-end;
-  padding:0 22px 11vh;pointer-events:none;
+  padding:0 22px 9vh;
 }
 .scene .block{max-width:560px;pointer-events:auto;opacity:0;transform:translateY(16px);transition:opacity .45s ease,transform .45s ease}
 .scene.on .block{opacity:1;transform:none}
@@ -116,14 +150,14 @@ h2{font-size:clamp(32px,6.6vw,60px)}
     content:'';position:fixed;left:0;top:0;bottom:0;width:44vw;z-index:5;pointer-events:none;
     background:linear-gradient(90deg,rgba(18,21,27,.96) 0%,rgba(18,21,27,.8) 52%,rgba(18,21,27,0) 100%);
   }
-  section.scene{justify-content:center;padding:0 0 0 5vw}
+  .scene .pin{justify-content:center;padding:0 0 0 5vw}
   .scene .block{max-width:31vw}
   h1{font-size:clamp(40px,4.8vw,66px)}
   h2{font-size:clamp(30px,3.5vw,48px)}
   /* notes live in the action zone (right two-thirds), never over the rail */
   #n0{top:20vh;right:8vw;left:auto}
   #n1{top:14vh;right:9vw;left:auto}
-  #n2{top:64vh;left:48vw;right:auto}
+  #n2{top:74vh;left:37vw;right:auto}
   #n3{top:34vh;left:66vw;right:auto;margin:0;translate:-50% 0}
   #n4{top:58vh;right:8vw;left:auto}
   #n5{top:12vh;right:13vw;left:auto}
@@ -163,12 +197,12 @@ section.paper{
 .signoff .under path{stroke:#C97300;stroke-width:2.4;fill:none;stroke-linecap:round}
 footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8A8F99;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 @media (max-width:640px){
-  section.scene{padding-bottom:15vh}
+  .scene .pin{padding-bottom:12vh}
   .note{max-width:160px}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .scene .block,.fnote,.pill{transition:none}
+  .scene .block,.fnote,.pill,#rail,#railDot,#rail .rt,#rail .rt.major::before,#rail .lbl{transition:none}
   .fnote,.caret{animation:none}
 }
 </style>
@@ -186,6 +220,8 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
 </div>
 
 <a class="pill" id="pill" href="#contact">Build your audience ↗</a>
+
+<nav id="rail" aria-label="Section progress"></nav>
 
 <!-- floating annotation layer — notes pin on screen while their animation forms -->
 <div id="noteLayer" aria-hidden="true">
@@ -240,62 +276,75 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
 </div>
 
 <!-- 0 — HERO -->
-<section class="scene" data-scene="0">
+<section class="scene" data-scene="0" style="--rw:180vh">
+  <div class="pin">
   <div class="block">
     <div class="eyebrow">METRO DETROIT, MI · 42.67°N 82.94°W</div>
     <h1>Every dot is a household.</h1>
     <p>Digital Pointes curates audiences from real-world signals — then reaches them on every channel and proves what worked.</p>
     <div class="cue">scroll — watch what we do with them ↓</div>
   </div>
+  </div>
 </section>
 
 <!-- 1 — CHANNEL NETWORK -->
-<section class="scene" data-scene="1">
+<section class="scene" data-scene="1" style="--rw:220vh">
+  <div class="pin">
   <div class="block">
     <div class="eyebrow">DIGITAL · EMAIL · CTV · SMS · DIRECT MAIL</div>
     <h2>One audience. Every channel, connected.</h2>
     <p>Display, social, CTV, email, SMS, and direct mail run as one system — the same household, one story, sequenced across every touchpoint. No duplicate spend, no dead ends.</p>
   </div>
+  </div>
 </section>
 
 <!-- 2 — INTENT / SIGNALS -->
-<section class="scene" data-scene="2">
+<section class="scene" data-scene="2" style="--rw:220vh">
+  <div class="pin">
   <div class="block">
     <div class="eyebrow">FULL-FUNNEL INTENT TRIGGERS</div>
     <h2>Some of them are in-market right now.</h2>
     <p>Searches, site visits, store loyalty, life events, even the questions they ask their community. Our intent triggers surface the households that are actually shopping — before your competitors know they exist.</p>
   </div>
+  </div>
 </section>
 
 <!-- 3 — HOUSEHOLD TARGETING (family formation) -->
-<section class="scene" data-scene="3">
+<section class="scene" data-scene="3" style="--rw:220vh">
+  <div class="pin">
   <div class="block">
     <div class="eyebrow">DATA · HOUSEHOLD TARGETING</div>
     <h2>Target the household, not just the device.</h2>
     <p>Hundreds of attributes per home — kids, income, homeownership, pets, purchase history. Build the exact audience: homeowners with children, five miles out, in-market for you.</p>
   </div>
+  </div>
 </section>
 
 <!-- 4 — GEOFENCE -->
-<section class="scene" data-scene="4">
+<section class="scene" data-scene="4" style="--rw:200vh">
+  <div class="pin">
   <div class="block">
     <div class="eyebrow">GEOFENCING · CAPTURE</div>
     <h2>We can draw the line anywhere.</h2>
     <p>A competitor's lot. A conference floor. A carrier route. Devices that cross the fence become an audience you own — and keep.</p>
   </div>
+  </div>
 </section>
 
 <!-- 5 — HAND RAISERS -->
-<section class="scene" data-scene="5">
+<section class="scene" data-scene="5" style="--rw:220vh">
+  <div class="pin">
   <div class="block">
     <div class="eyebrow">HAND RAISERS · IDENTITY · RETARGETING</div>
     <h2>When a hand goes up, we don't let go.</h2>
     <p>A site visit, a QR scan, a call, a click — any action flags the household as a hand raiser. Anonymous website visitors get identified and matched back to a real home. Then we stay on them, across every channel, until they convert.</p>
   </div>
+  </div>
 </section>
 
 <!-- 6 — ATTRIBUTION -->
-<section class="scene" data-scene="6">
+<section class="scene" data-scene="6" style="--rw:200vh">
+  <div class="pin">
   <div class="block">
     <div class="eyebrow">MEASUREMENT · ATTRIBUTION · OPTIMIZATION</div>
     <h2>Then we prove it — down to the household.</h2>
@@ -305,6 +354,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
       <div class="chip">STORE VISITS <b>+38%</b></div>
       <div class="chip">ROAS <b>5.2×</b></div>
     </div>
+  </div>
   </div>
 </section>
 
@@ -356,11 +406,12 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   const FENCE = { x: 0.5, y: 0.44, r: 0.20 };
   const rail = () => W >= 900;                  // desktop left-rail layout?
   const CX = () => rail() ? 0.66 : 0.5;         // action-zone center x
-  const RESULT = () => ({ x: CX(), y: portrait ? .84 : .80 });
+  // portrait: revenue sits at the ring's center (bottom is covered by the copy card)
+  const RESULT = () => ({ x: CX(), y: portrait ? .42 : .80 });
 
   function ring(){
     const cx = CX()*W, cy = .42*H;
-    const R = Math.min(W,H) * (portrait ? 0.36 : 0.28);
+    const R = Math.min(W,H) * (portrait ? 0.30 : 0.28);
     const L = ['DIGITAL','EMAIL','CTV','SMS','DIRECT MAIL'];
     return L.map((l,i)=>{
       const a = -Math.PI/2 + i*(Math.PI*2/5);
@@ -588,10 +639,78 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     if(ind) INDUSTRY = ind.toLowerCase().slice(0, 40);
   }catch(e){}
 
-  // ---- scroll ----
+  // ---- scroll (progress measured from real section geometry) ----
+  let SM = [];
+  function measureSections(){
+    SM = SCENES.map(el => ({
+      top: el.offsetTop,
+      span: Math.max(1, el.offsetHeight - window.innerHeight)
+    }));
+  }
+  measureSections();
+  window.addEventListener('resize', measureSections);
+  window.addEventListener('load', measureSections);
+
+  // ---- scroll rail: tick ruler with section jump ----
+  const RAIL_NAMES = ['Intro','Channels','Intent Signals','Household Targeting','Geofencing','Hand Raisers','Attribution','Contact'];
+  const railEl = document.getElementById('rail');
+  const railItems = SCENES.concat([document.getElementById('contact')]);
+  const railMajors = [];
+  railItems.forEach((el, i) => {
+    const b = document.createElement('button');
+    b.className = 'rt major';
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Jump to ' + RAIL_NAMES[i]);
+    const l = document.createElement('span');
+    l.className = 'lbl';
+    l.textContent = RAIL_NAMES[i];
+    b.appendChild(l);
+    b.addEventListener('click', () => {
+      window.scrollTo({ top: railItems[i].offsetTop, behavior: reduced ? 'auto' : 'smooth' });
+    });
+    railEl.appendChild(b);
+    railMajors.push(b);
+    if(i < railItems.length - 1){
+      for(let m = 0; m < 3; m++){
+        const s = document.createElement('span');
+        s.className = 'rt minor';
+        railEl.appendChild(s);
+      }
+    }
+  });
+  const railDot = document.createElement('span');
+  railDot.id = 'railDot';
+  railEl.appendChild(railDot);
+  const railTicks = Array.from(railEl.querySelectorAll('.rt'));
+  let railHover = false, railLastY = -1, railActiveAt = -1e9;
+  railEl.addEventListener('mouseenter', () => { railHover = true; });
+  railEl.addEventListener('mouseleave', () => { railHover = false; });
+  railEl.addEventListener('focusin',  () => { railHover = true; });
+  railEl.addEventListener('focusout', () => { railHover = false; });
+
+  function updateRail(f, y){
+    const now = performance.now();
+    if(railLastY < 0) railLastY = y;
+    if(Math.abs(y - railLastY) > 1){ railActiveAt = now; railLastY = y; }
+    railEl.classList.toggle('show', railHover || (now - railActiveAt) < 2000);
+    // DOM order: major0, m, m, m, major1, ... — tick k marks progress f = k/4
+    for(let k = 0; k < railTicks.length; k++){
+      railTicks[k].classList.toggle('on', f >= k/4 - 1e-6);
+    }
+    const i = Math.min(6, Math.floor(f)), t = Math.min(1, f - i);
+    const a = railMajors[i].offsetTop;
+    const b = railMajors[Math.min(railMajors.length - 1, i + 1)].offsetTop;
+    railDot.style.top = (a + (b - a) * t + 2) + 'px';
+  }
+
   function readScroll(){
-    const vh = window.innerHeight;
-    const f = Math.max(0, Math.min(7, window.scrollY/vh));
+    const y = window.scrollY;
+    let f = 0;
+    for(let i = 0; i < SM.length; i++){
+      if(y < SM[i].top) break;
+      f = i + Math.min(1, (y - SM[i].top) / SM[i].span);
+    }
+    f = Math.max(0, Math.min(7, f));
     scene = Math.min(6, Math.floor(f));
     sceneT = f - scene;
     if(scene !== lastScene){ lastScene = scene; assignTargets(); }
@@ -604,12 +723,18 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     // fully loaded well before it reaches 2/3 up the screen
     for(let i = 0; i < SCENES.length; i++){
       if(f >= i - 0.35) SCENES[i].classList.add('on');
+      // fade the outgoing card as the next one slides over it
+      const pushStart = SM[i].top + SM[i].span;
+      const push = Math.max(0, Math.min(1, (y - pushStart) / (window.innerHeight * 0.5)));
+      const blk = SCENES[i].querySelector('.block');
+      if(blk) blk.style.opacity = push > 0 ? String(1 - push) : '';
     }
     // search bar types with the scroll
     const q = 'best ' + INDUSTRY + ' in ' + CITY;
     const st = Math.max(0, Math.min(1, (f - 2.28) / 0.35));
     const typed = q.slice(0, reduced ? q.length : Math.round(st * q.length));
     if(SBOX.textContent !== typed) SBOX.textContent = typed;
+    updateRail(f, y);
   }
 
   // ---- HUD ----
