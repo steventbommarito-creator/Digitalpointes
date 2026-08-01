@@ -7,6 +7,7 @@ import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Nav from '@/components/Nav'
+import DesignBanner from '@/components/DesignBanner'
 import ServiceCard from '@/components/ServiceCard'
 import ContactForm from '@/components/ContactForm'
 import Footer from '@/components/Footer'
@@ -132,6 +133,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen" style={{ background: 'var(--bg)' }}>
+      <DesignBanner current="Agency" />
+      <div style={{ height: 36 }} />
       <Nav />
 
       {/* ============ HERO ============ */}

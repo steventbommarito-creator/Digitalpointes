@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Pointes — Engagement Through Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Caveat:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12151B;
+  --slate:#3A4150;
+  --orange:#FF9E1B;
+  --orange-glow:#FFB85C;
+  --chalk:#F4EFE6;
+  --paper:#FAF6EF;
+  --char:#1C1F26;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--chalk);
+  font-family:'Archivo',sans-serif;font-variation-settings:'wdth' 100;
+  overflow-x:hidden;
+}
+canvas#field{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-index:0}
+/* ---------- HUD ---------- */
+.hud{
+  position:fixed;top:0;left:0;right:0;z-index:30;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:18px 22px;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(18,21,27,.85),rgba(18,21,27,0));
+  transition:opacity .5s;
+}
+.hud .mark{font-weight:900;letter-spacing:.14em;font-size:13px;color:var(--chalk);font-variation-settings:'wdth' 118}
+.hud .mark span{color:var(--orange)}
+.hud .counter{text-align:right;font-family:'IBM Plex Mono',monospace}
+.hud .counter .num{font-size:20px;font-weight:500;color:var(--orange);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.hud .counter .lbl{font-size:9px;letter-spacing:.22em;color:rgba(244,239,230,.55);margin-top:2px}
+/* ---------- floating CTA ---------- */
+.pill{
+  position:fixed;right:18px;bottom:18px;z-index:30;
+  background:var(--orange);color:var(--char);text-decoration:none;
+  font-weight:800;font-size:13px;letter-spacing:.03em;
+  padding:12px 18px;border-radius:999px;
+  box-shadow:0 6px 24px rgba(255,158,27,.35);
+  opacity:0;transform:translateY(12px);transition:opacity .5s,transform .5s;
+}
+.pill.show{opacity:1;transform:none}
+.pill:focus-visible{outline:3px solid var(--chalk);outline-offset:2px}
+/* ---------- scenes ---------- */
+section.scene{
+  position:relative;z-index:10;min-height:100vh;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 22px 11vh;pointer-events:none;
+}
+.scene .block{max-width:560px;pointer-events:auto;opacity:0;transform:translateY(16px);transition:opacity .45s ease,transform .45s ease}
+.scene.on .block{opacity:1;transform:none}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;color:var(--orange);margin-bottom:14px}
+h1,h2{font-weight:900;font-variation-settings:'wdth' 88;line-height:.98;letter-spacing:-.01em;color:var(--chalk)}
+h1{font-size:clamp(42px,9vw,84px)}
+h2{font-size:clamp(32px,6.6vw,60px)}
+.scene p{margin-top:16px;font-size:clamp(15px,2.2vw,17px);line-height:1.55;color:rgba(244,239,230,.78);max-width:48ch}
+/* ---------- floating annotations (pin while their animation forms) ---------- */
+.fnote{
+  position:fixed;z-index:12;pointer-events:none;
+  opacity:0;transition:opacity .7s ease;
+  animation:bob 5s ease-in-out infinite alternate;
+}
+.fnote.on{opacity:1}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-9px)}}
+.fni{
+  font-family:'Caveat',cursive;font-weight:600;color:var(--orange-glow);
+  font-size:clamp(18px,3vw,25px);line-height:1.12;max-width:210px;
+}
+.fni svg{display:block;margin-top:4px;overflow:visible}
+.fni svg path{stroke:var(--orange-glow);stroke-width:2.2;fill:none;stroke-linecap:round}
+/* google-esque live search signal */
+.sbar{
+  display:flex;align-items:center;gap:10px;
+  background:#fff;color:#1C1F26;border-radius:999px;
+  padding:11px 18px;font-family:'Archivo',sans-serif;font-size:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,.45);white-space:nowrap;
+}
+.sbar svg{flex:none}
+.caret{display:inline-block;width:2px;height:16px;background:#1C1F26;margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.slabel{
+  font-family:'Caveat',cursive;font-weight:600;color:var(--orange-glow);
+  font-size:19px;margin-top:8px;text-align:center;transform:rotate(-2deg);
+}
+/* ---------- note positions (mobile-first; desktop overrides below) ---------- */
+#n0{top:22vh;right:6vw}
+#n1{top:13vh;right:6vw}
+#n2{top:40vh;left:4vw}
+#n3{top:19vh;left:0;right:0;width:max-content;margin:0 auto}
+#n4{top:46vh;right:8vw}
+#n5{top:18vh;right:6vw}
+#n6{top:16vh;left:8vw}
+#n7{top:12vh;right:5vw}
+#n8{top:14vh;left:7vw}
+#n9{top:26vh;right:8vw}
+#n10{top:13vh;left:7vw}
+/* ---------- copy legibility: mobile card, desktop left rail ---------- */
+@media (max-width:899px){
+  .scene .block{
+    background:rgba(18,21,27,.78);
+    border:1px solid rgba(255,158,27,.14);
+    border-radius:14px;padding:16px 16px 18px;
+  }
+}
+@media (min-width:900px){
+  /* the left third belongs to the copy — scrim keeps dots from fighting text */
+  body::before{
+    content:'';position:fixed;left:0;top:0;bottom:0;width:44vw;z-index:5;pointer-events:none;
+    background:linear-gradient(90deg,rgba(18,21,27,.96) 0%,rgba(18,21,27,.8) 52%,rgba(18,21,27,0) 100%);
+  }
+  section.scene{justify-content:center;padding:0 0 0 5vw}
+  .scene .block{max-width:31vw}
+  h1{font-size:clamp(40px,4.8vw,66px)}
+  h2{font-size:clamp(30px,3.5vw,48px)}
+  /* notes live in the action zone (right two-thirds), never over the rail */
+  #n0{top:20vh;right:8vw;left:auto}
+  #n1{top:14vh;right:9vw;left:auto}
+  #n2{top:64vh;left:48vw;right:auto}
+  #n3{top:34vh;left:66vw;right:auto;margin:0;translate:-50% 0}
+  #n4{top:58vh;right:8vw;left:auto}
+  #n5{top:12vh;right:13vw;left:auto}
+  #n6{top:16vh;left:48vw;right:auto}
+  #n7{top:11vh;right:8vw;left:auto}
+  #n8{top:15vh;left:48vw;right:auto}
+  #n9{top:24vh;right:8vw;left:auto}
+  #n10{top:13vh;left:48vw;right:auto}
+}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;border:1px solid rgba(255,158,27,.5);color:var(--chalk);padding:9px 13px;border-radius:8px;background:rgba(18,21,27,.55)}
+.chip b{color:var(--orange);font-weight:500}
+.cue{font-family:'Caveat',cursive;font-size:22px;color:rgba(244,239,230,.6);margin-top:26px;transform:rotate(-2deg)}
+/* ---------- paper ---------- */
+section.paper{
+  position:relative;z-index:20;background:var(--paper);color:var(--char);
+  padding:14vh 22px 60px;border-top-left-radius:28px;border-top-right-radius:28px;
+  box-shadow:0 -30px 80px rgba(0,0,0,.5);
+}
+.paper .inner{max-width:960px;margin:0 auto}
+.paper .eyebrow{color:#C97300}
+.paper h2{color:var(--char)}
+.paper .lede{margin-top:18px;font-size:clamp(16px,2.4vw,19px);line-height:1.6;color:#3B3F49;max-width:58ch}
+.offers{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:44px}
+.offer{border:1.5px solid #E4DCCB;border-radius:14px;padding:18px 16px;background:#fff}
+.offer h3{font-size:15px;font-weight:800}
+.offer p{margin-top:7px;font-size:13px;line-height:1.5;color:#5A5F6A}
+.offer .tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.2em;color:#C97300;display:block;margin-bottom:9px}
+.cta-row{margin-top:52px;display:flex;flex-wrap:wrap;align-items:center;gap:22px}
+.btn{background:var(--orange);color:var(--char);text-decoration:none;font-weight:900;font-size:16px;padding:17px 30px;border-radius:12px;box-shadow:0 8px 26px rgba(255,158,27,.4);transition:transform .2s;display:inline-block}
+.btn:hover{transform:translateY(-2px)}
+.btn:focus-visible{outline:3px solid var(--char);outline-offset:3px}
+.contact{font-family:'IBM Plex Mono',monospace;font-size:13px;color:#3B3F49;line-height:1.9}
+.contact a{color:#C97300;text-decoration:none}
+.signoff{font-family:'Caveat',cursive;font-weight:600;font-size:30px;color:#C97300;margin-top:56px;transform:rotate(-2deg)}
+.signoff .under{display:block;width:180px;margin-top:2px}
+.signoff .under path{stroke:#C97300;stroke-width:2.4;fill:none;stroke-linecap:round}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8A8F99;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media (max-width:640px){
+  section.scene{padding-bottom:15vh}
+  .note{max-width:160px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .scene .block,.fnote,.pill{transition:none}
+  .fnote,.caret{animation:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="field" aria-hidden="true"></canvas>
+
+<div class="hud" id="hud">
+  <div class="mark">DIGITAL<span>&nbsp;POINTES</span></div>
+  <div class="counter">
+    <div class="num" id="hudNum">0</div>
+    <div class="lbl" id="hudLbl">HOUSEHOLDS INDEXED</div>
+  </div>
+</div>
+
+<a class="pill" id="pill" href="#contact">Build your audience ↗</a>
+
+<!-- floating annotation layer — notes pin on screen while their animation forms -->
+<div id="noteLayer" aria-hidden="true">
+  <div class="fnote" id="n0" data-from="0.03" data-to="0.95">
+    <div class="fni" style="transform:rotate(3deg)">every dot is someone's front porch
+      <svg width="70" height="34" viewBox="0 0 70 34"><path d="M62 2 C 40 10, 22 14, 6 28 M14 20 L6 28 L17 30"/></svg>
+    </div>
+  </div>
+  <div class="fnote" id="n1" data-from="1.02" data-to="1.5">
+    <div class="fni">was on your website at 11:40 last night
+      <svg width="56" height="36" viewBox="0 0 56 36"><path d="M8 4 C 20 14, 34 20, 46 30 M38 27 L46 30 L43 21"/></svg>
+    </div>
+  </div>
+  <!-- persists from intent all the way through the geofence draw -->
+  <div class="fnote" id="n2" data-from="1.15" data-to="3.9">
+    <div class="fni" style="transform:rotate(-5deg)">visits the competitor down the street every Friday</div>
+  </div>
+  <div class="fnote search" id="n3" data-from="1.3" data-to="1.98">
+    <div class="sbar">
+      <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5.2" fill="none" stroke="#9AA0A6" stroke-width="1.8"/><line x1="11" y1="11" x2="15" y2="15" stroke="#9AA0A6" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span id="stext"></span><span class="caret"></span>
+    </div>
+    <div class="slabel">a live intent trigger ↑</div>
+  </div>
+  <div class="fnote" id="n4" data-from="1.5" data-to="1.98">
+    <div class="fni" style="transform:rotate(2deg)">asked the Facebook group for financial advisor recs</div>
+  </div>
+  <div class="fnote" id="n5" data-from="2.1" data-to="2.95">
+    <div class="fni" style="transform:rotate(3deg)">two kids and a mortgage
+      <svg width="60" height="38" viewBox="0 0 60 38"><path d="M52 4 C 36 14, 22 18, 8 32 M16 26 L8 32 L19 34"/></svg>
+    </div>
+  </div>
+  <div class="fnote" id="n6" data-from="3.05" data-to="3.95">
+    <div class="fni" style="transform:rotate(-5deg)">your competitor's parking lot
+      <svg width="60" height="44" viewBox="0 0 60 44"><path d="M6 4 C 20 20, 34 28, 50 38 M41 36 L50 38 L47 28"/></svg>
+    </div>
+  </div>
+  <div class="fnote" id="n7" data-from="4.05" data-to="4.95">
+    <div class="fni" style="transform:rotate(2deg)">no silos — every channel talks to the others</div>
+  </div>
+  <div class="fnote" id="n8" data-from="5.02" data-to="5.95">
+    <div class="fni" style="transform:rotate(-4deg)">clicked the mailer QR ✓</div>
+  </div>
+  <div class="fnote" id="n9" data-from="5.15" data-to="5.95">
+    <div class="fni" style="transform:rotate(3deg)">called, didn't book — yet
+      <svg width="52" height="34" viewBox="0 0 52 34"><path d="M6 4 C 18 14, 30 20, 42 28 M34 26 L42 28 L39 19"/></svg>
+    </div>
+  </div>
+  <div class="fnote" id="n10" data-from="6.05" data-to="6.9">
+    <div class="fni" style="transform:rotate(-4deg)">sample numbers — yours come from your dashboard</div>
+  </div>
+</div>
+
+<!-- 0 — HERO -->
+<section class="scene" data-scene="0">
+  <div class="block">
+    <div class="eyebrow">METRO DETROIT, MI · 42.67°N 82.94°W</div>
+    <h1>Every dot is a household.</h1>
+    <p>Digital Pointes curates audiences from real-world signals — then reaches them on every channel and proves what worked.</p>
+    <div class="cue">scroll — watch what we do with them ↓</div>
+  </div>
+</section>
+
+<!-- 1 — INTENT / SIGNALS -->
+<section class="scene" data-scene="1">
+  <div class="block">
+    <div class="eyebrow">FULL-FUNNEL INTENT TRIGGERS</div>
+    <h2>Some of them are in-market right now.</h2>
+    <p>Searches, site visits, store loyalty, life events, even the questions they ask their community. Our intent triggers surface the households that are actually shopping — before your competitors know they exist.</p>
+  </div>
+</section>
+
+<!-- 2 — HOUSEHOLD TARGETING (family formation) -->
+<section class="scene" data-scene="2">
+  <div class="block">
+    <div class="eyebrow">DATA · HOUSEHOLD TARGETING</div>
+    <h2>Target the household, not just the device.</h2>
+    <p>Hundreds of attributes per home — kids, income, homeownership, pets, purchase history. Build the exact audience: homeowners with children, five miles out, in-market for you.</p>
+  </div>
+</section>
+
+<!-- 3 — GEOFENCE -->
+<section class="scene" data-scene="3">
+  <div class="block">
+    <div class="eyebrow">GEOFENCING · CAPTURE</div>
+    <h2>We can draw the line anywhere.</h2>
+    <p>A competitor's lot. A conference floor. A carrier route. Devices that cross the fence become an audience you own — and keep.</p>
+  </div>
+</section>
+
+<!-- 4 — CHANNEL NETWORK -->
+<section class="scene" data-scene="4">
+  <div class="block">
+    <div class="eyebrow">DIGITAL · EMAIL · CTV · SMS · DIRECT MAIL</div>
+    <h2>One audience. Every channel, connected.</h2>
+    <p>Display, social, CTV, email, SMS, and direct mail run as one system — the same household, one story, sequenced across every touchpoint. No duplicate spend, no dead ends.</p>
+  </div>
+</section>
+
+<!-- 5 — HAND RAISERS -->
+<section class="scene" data-scene="5">
+  <div class="block">
+    <div class="eyebrow">HAND RAISERS · IDENTITY · RETARGETING</div>
+    <h2>When a hand goes up, we don't let go.</h2>
+    <p>A site visit, a QR scan, a call, a click — any action flags the household as a hand raiser. Anonymous website visitors get identified and matched back to a real home. Then we stay on them, across every channel, until they convert.</p>
+  </div>
+</section>
+
+<!-- 6 — ATTRIBUTION -->
+<section class="scene" data-scene="6">
+  <div class="block">
+    <div class="eyebrow">MEASUREMENT · ATTRIBUTION · OPTIMIZATION</div>
+    <h2>Then we prove it — down to the household.</h2>
+    <p>Household-level match-back, even on saturation and broad-reach campaigns. Foot-traffic lift, pixels, promo codes — every dollar traced from impression to revenue, in reports you can actually read.</p>
+    <div class="chips">
+      <div class="chip">SATURATION MATCH-BACK <b>HH-LEVEL</b></div>
+      <div class="chip">STORE VISITS <b>+38%</b></div>
+      <div class="chip">ROAS <b>5.2×</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 — HUMAN / PAPER -->
+<section class="paper" id="contact">
+  <div class="inner">
+    <div class="eyebrow">THE PART THE DATA CAN'T DO</div>
+    <h2>Data does the targeting.<br>People do the work.</h2>
+    <p class="lede">No black box, no bloated retainer. A small team on call builds the plan, runs every channel, and walks you through the numbers in plain English — backed by AI chat and phone receptionists so no lead ever rings out. Rooted in client satisfaction, priced for any budget.</p>
+
+    <div class="offers">
+      <div class="offer"><span class="tag">MOVERS</span><h3>Predictive Movers</h3><p>Online and offline triggers spot households likely to move — before they list.</p></div>
+      <div class="offer"><span class="tag">MAIL + DIGITAL</span><h3>Digital Carrier Routes</h3><p>Saturation mail with a digital overlay — and household-level attribution on every route.</p></div>
+      <div class="offer"><span class="tag">CAPTURE</span><h3>Conquest &amp; Capture</h3><p>Win customers from complementary and competitive locations.</p></div>
+      <div class="offer"><span class="tag">RETENTION</span><h3>Loyalty Ads</h3><p>Re-engage anonymous foot traffic and turn visits into repeat patrons.</p></div>
+      <div class="offer"><span class="tag">AI AGENTS</span><h3>AI Receptionists</h3><p>Chat and voice agents answer every call and message, book the appointment, and hand off warm leads.</p></div>
+      <div class="offer"><span class="tag">IDENTITY</span><h3>Visitor Identity</h3><p>Anonymous website traffic identified and matched to real households for follow-up.</p></div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn" href="mailto:Sales@digitalpointes.com">Build your audience</a>
+      <div class="contact">
+        <a href="tel:5862658858">586.265.8858</a><br>
+        <a href="mailto:Sales@digitalpointes.com">Sales@digitalpointes.com</a>
+      </div>
+    </div>
+
+    <div class="signoff">— the Digital Pointes team
+      <svg class="under" viewBox="0 0 180 12"><path d="M2 8 C 40 2, 90 12, 178 5"/></svg>
+    </div>
+
+    <footer>
+      <span>© 2026 DIGITAL POINTES, LLC</span>
+      <span>ENGAGEMENT THROUGH DATA</span>
+    </footer>
+  </div>
+</section>
+
+<script>
+(function(){
+  const cv = document.getElementById('field');
+  const ctx = cv.getContext('2d');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = Math.min(window.innerWidth, window.innerHeight) < 640;
+  const N = mobile ? 380 : 950;
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0, portrait = false;
+
+  const FENCE = { x: 0.5, y: 0.44, r: 0.20 };
+  const rail = () => W >= 900;                  // desktop left-rail layout?
+  const CX = () => rail() ? 0.66 : 0.5;         // action-zone center x
+  const RESULT = () => ({ x: CX(), y: portrait ? .84 : .80 });
+
+  function ring(){
+    const cx = CX()*W, cy = .42*H;
+    const R = Math.min(W,H) * (portrait ? 0.36 : 0.28);
+    const L = ['DIGITAL','EMAIL','CTV','SMS','DIRECT MAIL'];
+    return L.map((l,i)=>{
+      const a = -Math.PI/2 + i*(Math.PI*2/5);
+      return { x:(cx+Math.cos(a)*R)/W, y:(cy+Math.sin(a)*R)/H, l };
+    });
+  }
+
+  // ---- particles ----
+  const P = [];
+  for(let i=0;i<N;i++){
+    const intent = Math.random() < 0.16;
+    P.push({
+      hx:Math.random(), hy:Math.random(), x:0,y:0, tx:0,ty:0,
+      ph:Math.random()*Math.PI*2, sp:0.4+Math.random()*0.8,
+      intent,
+      fam: Math.random() < 0.30,
+      ch: (Math.random()*5)|0,
+      raiser: intent && Math.random() < 0.28,
+      convAt: 0.2 + Math.random()*0.65,
+      fa:Math.random()*Math.PI*2, fr:Math.pow(Math.random(),0.6)
+    });
+  }
+
+  // ---- the family portrait (stipple image → particle targets) ----
+  const FAMILY_SRC = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA4KCw0LCQ4NDA0QDw4RFiQXFhQUFiwgIRokNC43NjMuMjI6QVNGOj1OPjIySGJJTlZYXV5dOEVmbWVabFNbXVn/2wBDAQ8QEBYTFioXFypZOzI7WVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVn/wAARCADIASwDASIAAhEBAxEB/8QAGwABAAEFAQAAAAAAAAAAAAAAAAMCBAUGBwH/xAAxEAACAgIBAwMDAwMEAwEAAAAAAQIDBBEhBRIxBkFREyJhBxQyQnGBFSMzoRY0UpH/xAAZAQEAAwEBAAAAAAAAAAAAAAAAAgMEAQX/xAAlEQACAgICAgIBBQAAAAAAAAAAAQIRAyESMSJBMlFCBBNSYXH/2gAMAwEAAhEDEQA/AOkgAAAAAAAAAAAAAAAAAFMpKK3JpL8lvn5kMHEnfY/titnL+t+scnKnKupuMd8a+CEp1pdk4wvbOqq+ptf7kefySKSfhpnCZdazJTT/AHE1rxpmX6b6rz8WcW7XYn5UmR5tdol+2n0zsAMT0HrNXV8RTi0rF/KPwZYsTtWVtVoAA6cAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANN/UTMlR0yFUXrvfJzjpuEshynPnXsbr+oeQ7boUJfwWzWMVPCqTaW5cvZjzT7UezXih030VWdEqnDcHpllZ0i6EG4vhGdxM6i5NNdkl/wBj9xRNuKsW/gyLNli6ZqeLHJWiX9Pcq2vqzo/pa5OqGgehOnr95kZbjwnpM389PE7VnnZdOgCi22FMHOySjFeWzWeoetum4ljrhJ2yX/yTbSIJNm0g0/E9d4d1qhOEoJ+5tGJmUZlSsompRfwcUk9HXFrsuAASIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8b0tsA0T1xgS+vHJ0+3SRh5V0Soi7ZRT1wmbP6w6li24FmLVbGVy50jmsZyvkouTbiuDzs2LlLTN+HJUdozUaKW5dko8r2Za1dMaf1Iz8eSGWN2UxnGx979kXfQqMjMzliqTal517FcYy/FlspL8kdC9H48qOkRcv63s2At8HHWJiV0rxBaJbZ9lcpP2Wz04qopHmyduznf6gdctjd+xpn2xS3No0anFvuXfGDl+WZH1Be83rNk5L+U9f4MzgVRrqjFJa0ZM+fgrRrxYuXZq0ozhLlNNexsPpjr9uDkxTk/pt6aZZ9VjT391TTkvJY1x733wWn7nFPlHl0HGnR3LFvjk0Rtg9qS2TGnei+qfUp/a2PmPjZuJqxz5xsyzjxdAAFhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8bUVtvSNd6x6pxsDuhX/uTXwRlJR7JRi5dGwznGEW5NJL5NZ9RepsfFxZ1UWKVrWlo0vq/qnMzW4qbhF+yNfhbK29d7ct/JTKbktdF0cai9l/j2/Uy7bLW3Kz5LS+EsfJ+pBPX4JuxVvuctdvguPqRvgm/7Ga6d+jSlaosv3cW+6Hd3/Bv/wCn2NR9Gy9/dfJ8v4OfXJVtyjHWi+6R1nI6ZByom1Le2i6LUdoqmm9M7WWvUbVTg3Tl4UWan0X1xTeowzdQl8+xkfUnVKJ9Culj3QbkuOS/mmtGbg09nKc2yM87cd7cmzK4VeTC2M5vUX7bMDbN9/1Pfe9mWpy7MrHioSW4rwZc0XxRrxNWzKfsqZWudqXnkxvU6YY0ldj67d8pGSxoOVKi5SbfkxvW7qq61jVctcsy4uTnV2X5K4tmU9OdSphnVWr7dcOJ1LGyK8mmNlclKLOE4D1cudb8P8nV/SGRKzD7JrUo/wDZtx+E+P2Y8i5R5fRsoANZmAAAAAAAAAAAAAAAAAAAAAAAAAAAAB5J6i38AGser+sPDx/29banNcv4RzS26Un3NuTfu2Zr1dnvJz7Yv2eka7Kz7VpmJ3N2bFUVRHYpb7m1v4PFZqKPU25csdqUXzyWf6RGTfOyEUlr5JcLJcZan4+SJeH8kUovv0n5HFNULadl1nZMO9di2WVffZa3p6fkWLXD8k2Lv7Y+VJnUlGOiLblLZ7CMY/LZP9WFlbhZZJfHPBc/srJrcY6X9i0n0+7nUZP/AAVqcZeyxwkvRa2xUZuKe4vwRqVmNYnCTRM6nFTUvMSGcvqR5XJctlLM5i9XyJ4/YoR347jE5Tm725ttt8k/S4ycte2zzqce2968lMIxhkaSLpNyhbIINxk3F8r2Nx9Ldf8A2Uoqa+18NbNMUn3KUXplxG3tcZf1e5LJG9rshFrpndcTMqy6Y2VyT2i5OQ4HW8nHUVXJ8ex0L091d9Qx0rNKaO481vjLshPFStGcABpKQAAAAAAAAAAAAAAAAAAAAAAAAW+dcqMO2x/0xbLgwnqy909EuaetrRGTpNkoq2kcq6hf9fJtt15kzG3b7vfXkmm3tvymQXNa2/8ADM8FRokzyp9z23yTQlHTTIK1tbX+CTb4WtEpIiiTtWvwNPuXGtCMtrT8FL5nFN8bIkiG/m3TMjgYiV68tRW9FhkxgrPsbZmek9QhJRrcF9SK8/JHK5KFxJYkuey/xsyf1lU6Wlvy0T359Vdv09LZGsuydjXZFNe2iv6lFku22qLkueEea0rto2pv7Nb6lJRttcVrZYOSVKSXkyXWLIObjWklJ+xjJLiKSPVxfFWefl+TMp0hx7ddyTfyOqwjF9zktlnTFxinspe7JtzbeiPDz5WT5+HGiLT39vKPZSfdymTRc09RWl8IyFNMLF2WLbkSlPj2QUG+i1xrn7M2z0vmunNh92k2aplYk8O9xafa/D+S96dkOu5a0mudlORJrlEsj/Fna4vuin8lRj+i5Sy+n1z90tMyBti+StGNqnQABI4AAAAAAAAAAAAAAAAAAAAADS/1CynXhV0p/wA3yjczm36h2Sl1CqG1pRK8j0WY1s0p/YnzvZBZJuGtcFc24z87iUTX2t68kIljYq2ocFcWm/JbRm0tfJWn2rzySaIpkzn2qSTX9ymL7rIpcshb2tJbbM90+mjGpTs/5JLf3RK8klBWSguboxl2Lcp7cJJMusahU3xUP5NefyT5mT39va2kn4Le2SpcbO9c8r5KuUpKmW8YxdmUx8qEPsy4tSXiSIM/qOourGg49y/ky7xpVX0ptLu1t7MbnW1K19+lLWor4M8Ipz6L5tqPZhW5b3JtslgnLWvYlVasXKXHweuH0Gnvafv8G9yXRiUfYmnGG3weVJNf3KLJp/audkqXY4r8nPRK9mzYHTa1jKUop7XlkeRg1Sb+hZuceUkVdNnlOS+otVPjll7RhUV5Epu17fhbPJlNxk22bkk0qRhL7v32NKm3Ub6/H5Mfj2OE9fHDMh1j6VOd3Ql97fgx2Qu3IU4+JcG7FTjrpmaemdI9DZrnTOib58rk3I5T6XzP2mdB86b0dUrkpwUl4aNGCWnH6M+ZbsqABoKQAAAAAAAAAAAAAAAAAAAADw5j+oMXX1WD/wDqPk6ear6w9OT6xXG2h6uguF8kJq0Tg6ZyqUY/U7H5a8nkFFqSXOvBLndPyen5EoZFM017tFnCxQtXxsr4sttGQXS5WVqTSTfwP9Gm1/NE9ec4/wBUe0mXVe3z2GZzzejQoYvZja+nSpvjKb3GL5Lm66fH1Zf2RTf1P677NR+5+xDlTTsXGu1aWidSk1zIPjH4EjsrlNaX5I7qoyfd7luppPTfguY2RlWtvkk049EbUuyrHhc4zUZdrS+S3sp47rOW/wAl1S3JT99EMdvfPH5OJu2GkeURXY+da/7PLZKdbjv22V2TjGM1r240W1b3BvfPwSSvZxv0W6k+5N/JNOUnqS9iGS1Jr8l1Bf7bT5LZfZVEzWL1B5VFcO9KUfZ+5l5OMKVbZLSivHyaTGEu9fTbT37Gbqjd+3bnKUkl4ZgzYEnpmzHlb7RY5dzys5z1wn/0e5qbpXymU1xXdOZe4qV8Y1yr3LfH9i9tRqvRUlyv+zzpdtkZpL28M6v6czv3nT4qTTnDhmh4/T6+/u7vpyfiEOTafR24vJhvai/JVgyqWXxO5Y1DZtYAPSMQAAAAAAAAAAAAAAAAAAAAAAABZ53TsXNqlG+qM9r3Rxf1L0+GF1W6ur+Kfj4O5y/izjfrBxfWbnva2VzdNFkFaZrUY75/6Di3rfgr0lymUyT3z4FnaKseK+sn8E05d2/dkdb8tLwJuST41sg9sktIhjtzfJcwTcVt+PYtYr73oud6S+7klI5EuKJ9nc9EVj48klEu1t67kiKz7m2lrb8FSWyz0UTj3Q48oopiu35JHPSS8IjobctR9yzdEPZ5dDVseOGXNUdJt+GiHJlzB+y4PVZtxXhHHbQVJlxjSdVsXFJvyzJXZc5VKDSin8GLg+W98kzlrT8popnFN2y2MqR73QhDtS5b5K6Mh1X9z5W+UWvf9z35Kam2/wApnXC1s5y3o23GyI2uEaJbb8xijf8AofT44WJwvun90jQvRb7+opShw2dQXCOfpsSi2zmfI2kj0AG0ygAAAAAAAAAAAAAAAAAAAAAAAEd3/FPXwcR685S6lc5+e9+TuE490HH5Rx71niwwerSrU3JS+7n2K5q2mWQemjXk21wlo813QfjZ6pNrsTSRHzFkaJkuMouM1IkskpRa0W0JyhLa5bMr06MZR3ZHmXyQn4+RKHl4mG8WcEraelEm6hSqct6Wk/BDLXHJYnySZBri2iauWn2e+jyW4tr48tFEGlZHye2JvfbojWyV6I5cvgmx4wa52n8kMeXrxpGZ6bRFYU7LI7+COWXGJ3HHkzFZKa7d8rZHNaR5dLuvl2+ExNNJbLEqSIN7ZcVLjeyV2vSitaLettR2VuXHyytrZNPR7J6+7z/c8qkvqtspnPhHla3Pg7Wjl7Nx9JW66nV2v38HUl4Rx30xOUOr0fLlxydij/FDCqsjl3R6ADQUgAAAAAAAAAAAAAAAAAAAAAAAA5P+odbfWt6/pOsGm+sOjQz5OyH/ADJcEZIlFnKNtS4Kpyc1yktfBe5fTbKHJPiUfKLBKS8pkaJ2ew7e6K2ze5dDf/j1GTRuUq1t/lGkYlUr8quEVzKSR2no+LKPSo03Jfx1oONqmcUuLtHKc3HeUk4pKUfJjrqLKdd8dfDMt1W7/Tur5FOtqMnoxeTnzyJPaXZ8FEIzi69GicoSV+yOv/lTbWjye9trwyOEkpbbJJyiuE9/2La2Vei/wMGuene2nLlIv+pZUMbEdVaSXgwkMq6MlJT8eCm/Jnkw3N8rxooeKUppyei5ZYxi0lshrb7myq3hJ/Iprasimnpk2ZVCuUFF/wBzQ35UUJeNkUZPXDK+9afyUJdvlbG9vhaRwFSknFrXnwe0KSseiltLhNaL7BpX0pWbak/H5IyfFWSirZnPSGP+56vS1x2cv8nW14Ro/oPpbrjPLm1tvSSN4J4lqyGV7o9ABaVAAAAAAAAAAAAAAAAAAAAAAAAAss6pTW/cvSK1e4BqPVeh1ZljlJdra8mGl6YrjD7anJ/J0GVMJNNrbDohvhaI0Ss0foHp2NeX9S2v+D2jeq01W0l4RRj0qE5NLyTxj5/J1HGcl6/0i3N6tlWV/wAlLx8msX4t2NY42wcdfJ2yzp9Mb7JqC23tsxvV+g05tMv9td2tp6OUds49rkqbXsjcsT0vOzN7LKtxRNk+koR6g4KLjH4QO2aRHl+GZboHTH1LOjRtLfLNx/8AEKHVFwj487L7o3RasHqtUq6+1pcs5R2zDepfS1eBgQyaW+6H8vyaRlNytW/g7J6yrlPoNyittHI541180owfwiL+R2PxLNN6/DPUuPwZB9HzIaX0pP8Awex6HnuX/rz/APw7RyywVffOKiuTOYdacaq9e6TIaOlZUI2ylVKPYudoyvp7Gnl9QhBxaS5bKJpyaRfBpJs3f0nGNVNtcH9qZshiui4sMdWuC8yMqaYKkZpO2AASIgAAAAAAAAAAAAAAAAAAAAAAAAplHuQAAUeDzsAAPYx0e6AAKHWnJ7RTOraaAAI6cWNcm0vIsxYzu+ppPgAArVXGtHixo/XVmuUgACS+mF9TrsScZcNMwtfpnDqvc4L7W99oAo7ZdrpVMW5dpcV4kFW04IA4cIp9OpsrlCyCal5GL0zGw4v6Fai37gCjtk2FX9OElz59y6ACDAAOnAAAAAAAAAAAAD//2Q==';
+  const FN = mobile ? 2600 : 5200;
+  const FP = [];
+  for(let i=0;i<FN;i++){
+    FP.push({ x:0, y:0, tx:0, ty:0, pt:null,
+              ph:Math.random()*Math.PI*2, sp:0.5+Math.random()*0.7,
+              st:Math.random()*0.4 });
+  }
+  let famAlpha = 0, PPTS = null, PASPECT = 1.5;
+  const TONES = [ // darkest → brightest: [r, g, b, radius, alpha]
+    [150,  74,   6, 1.1, 0.6],
+    [224, 123,   0, 1.3, 0.8],
+    [255, 158,  27, 1.5, 0.9],
+    [255, 184,  92, 1.8, 1.0]
+  ];
+  (function loadPortrait(){
+    const img = new Image();
+    img.onload = function(){
+      PASPECT = img.width / img.height;
+      const sw = 280, sh = Math.max(1, Math.round(sw / PASPECT));
+      const oc = document.createElement('canvas');
+      oc.width = sw; oc.height = sh;
+      const g = oc.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, sw, sh);
+      g.drawImage(img, 0, 0, sw, sh);
+      const d = g.getImageData(0, 0, sw, sh).data;
+      const pts = [];
+      let guard = 0;
+      while(pts.length < FN && guard < FN*120){
+        guard++;
+        const x = Math.random()*sw, y = Math.random()*sh;
+        const i = ((y|0)*sw + (x|0))*4;
+        const lum = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+        if(lum > 231) continue;                       // page-white background
+        const ink = 1 - lum/231;
+        if(Math.random() > 0.22 + ink*0.78) continue; // density follows the ink
+        pts.push({ u: x/sw, v: y/sh,
+                   tone: lum < 60 ? 0 : lum < 120 ? 1 : lum < 180 ? 2 : 3 });
+      }
+      pts.sort((a,b) => a.tone - b.tone);             // tone-grouped for fast fills
+      for(let i=0;i<FN;i++) FP[i].pt = pts[i % pts.length];
+      PPTS = pts;
+      if(scene === 2) assignTargets();                // arrived mid-scene? re-aim
+    };
+    img.src = FAMILY_SRC;
+  })();
+
+  let scene = 0, sceneT = 0, lastScene = -1;
+
+  function assignTargets(){
+    const anchors = ring();
+    const fMin = Math.min(W,H);
+    const fx = CX()*W, fy = FENCE.y*H, frr = FENCE.r*fMin;
+    const maxBW = rail() ? W*0.52 : W*0.94;
+    let boxH = fMin*0.72, boxW = boxH*PASPECT;
+    if(boxW > maxBW){ boxW = maxBW; boxH = boxW/PASPECT; }
+    const bx0 = CX()*W - boxW/2, by0 = rail() ? H*0.14 : H*0.10;
+    const R = RESULT();
+
+    for(const p of P){
+      if(scene <= 1){
+        p.tx = p.hx*W; p.ty = p.hy*H;
+      } else if(scene === 2){
+        p.tx = p.hx*W; p.ty = p.hy*H;
+      } else if(scene === 3){
+        if(p.intent){
+          p.tx = fx + Math.cos(p.fa)*frr*0.82*p.fr;
+          p.ty = fy + Math.sin(p.fa)*frr*0.82*p.fr;
+        } else { p.tx = p.hx*W; p.ty = p.hy*H; }
+      } else if(scene === 4){
+        if(p.intent){
+          const a = anchors[p.ch];
+          p.tx = a.x*W + (Math.random()-0.5)*(mobile?56:90);
+          p.ty = a.y*H + (Math.random()-0.5)*(mobile?40:60);
+        } else { p.tx = p.hx*W; p.ty = p.hy*H; }
+      } else if(scene === 5){
+        if(p.raiser){
+          const a = Math.random()*Math.PI*2, rr = Math.sqrt(Math.random())*(mobile?70:110);
+          p.tx = CX()*W + Math.cos(a)*rr;
+          p.ty = 0.42*H + Math.sin(a)*rr;
+        } else if(p.intent){
+          const a = anchors[p.ch];
+          p.tx = a.x*W + (Math.random()-0.5)*(mobile?56:90);
+          p.ty = a.y*H + (Math.random()-0.5)*(mobile?40:60);
+        } else { p.tx = p.hx*W; p.ty = p.hy*H; }
+      } else { // 6
+        if(p.raiser){
+          const a = Math.random()*Math.PI*2, rr = Math.sqrt(Math.random())*(mobile?34:50);
+          p.tx = R.x*W + Math.cos(a)*rr;
+          p.ty = (R.y-0.07)*H + Math.sin(a)*rr;
+        } else if(p.intent){
+          const a = anchors[p.ch];
+          p.tx = a.x*W + (Math.random()-0.5)*(mobile?56:90);
+          p.ty = a.y*H + (Math.random()-0.5)*(mobile?40:60);
+        } else { p.tx = p.hx*W; p.ty = p.hy*H; }
+      }
+    }
+    // family pool: split off from existing dots, fly to portrait points
+    if(scene === 2 && PPTS){
+      for(const q of FP){
+        const src = P[(Math.random()*P.length)|0];
+        q.x = src.x; q.y = src.y;
+        q.tx = bx0 + q.pt.u*boxW;
+        q.ty = by0 + q.pt.v*boxH;
+      }
+    }
+  }
+
+  function resize(){
+    W = window.innerWidth; H = window.innerHeight;
+    portrait = H > W;
+    cv.width = W*DPR; cv.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    assignTargets();
+  }
+  resize();
+  for(const p of P){ p.x = p.tx; p.y = p.ty; }
+  window.addEventListener('resize', resize);
+
+  // ---- floating notes + live search signal ----
+  const SCENES = Array.from(document.querySelectorAll('.scene'));
+  const NOTES = Array.from(document.querySelectorAll('.fnote')).map(el => ({
+    el, from: parseFloat(el.dataset.from), to: parseFloat(el.dataset.to)
+  }));
+  const SBOX = document.getElementById('stext');
+  let CITY = 'your city';
+  try{
+    const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').split('/').pop().replace(/_/g,' ');
+    if(tz && !/UTC|GMT/i.test(tz)) CITY = tz;
+  }catch(e){}
+  fetch('https://ipapi.co/json/')
+    .then(r => r.json())
+    .then(d => { if(d && (d.city || d.region)) CITY = d.city || d.region; })
+    .catch(() => {});
+  // industry via URL param — e.g. ?industry=hvac — defaults to roofing
+  let INDUSTRY = 'roofer';
+  try{
+    const ind = (new URLSearchParams(location.search).get('industry') || '').trim();
+    if(ind) INDUSTRY = ind.toLowerCase().slice(0, 40);
+  }catch(e){}
+
+  // ---- scroll ----
+  function readScroll(){
+    const vh = window.innerHeight;
+    const f = Math.max(0, Math.min(7, window.scrollY/vh));
+    scene = Math.min(6, Math.floor(f));
+    sceneT = f - scene;
+    if(scene !== lastScene){ lastScene = scene; assignTargets(); }
+    document.getElementById('pill').classList.toggle('show', f > 0.9 && f < 6.6);
+    document.getElementById('hud').style.opacity = f > 6.5 ? '0' : '1';
+    for(const n of NOTES){
+      n.el.classList.toggle('on', f >= n.from && f <= n.to);
+    }
+    // reveal each scene's copy as soon as it's ~15% into view —
+    // fully loaded well before it reaches 2/3 up the screen
+    for(let i = 0; i < SCENES.length; i++){
+      if(f >= i - 0.35) SCENES[i].classList.add('on');
+    }
+    // search bar types with the scroll
+    const q = 'best ' + INDUSTRY + ' in ' + CITY;
+    const st = Math.max(0, Math.min(1, (f - 1.28) / 0.35));
+    const typed = q.slice(0, reduced ? q.length : Math.round(st * q.length));
+    if(SBOX.textContent !== typed) SBOX.textContent = typed;
+  }
+
+  // ---- HUD ----
+  const hudNum = document.getElementById('hudNum');
+  const hudLbl = document.getElementById('hudLbl');
+  const HUD = [
+    {v:2412847, l:'HOUSEHOLDS INDEXED', $:false},
+    {v:61204,   l:'INTENT SIGNALS',     $:false},
+    {v:38566,   l:'HOMES WITH CHILDREN',$:false},
+    {v:8412,    l:'DEVICES IN FENCE',   $:false},
+    {v:8412,    l:'HOUSEHOLDS REACHED', $:false},
+    {v:1318,    l:'HAND RAISERS',       $:false},
+    {v:214700,  l:'ATTRIBUTED REVENUE', $:true}
+  ];
+  let shown = 0;
+  function tickHud(){
+    const t = HUD[scene];
+    shown = reduced ? t.v : shown + (t.v - shown)*0.08;
+    hudNum.textContent = (t.$ ? '$' : '') + Math.round(shown).toLocaleString('en-US');
+    if(hudLbl.textContent !== t.l) hudLbl.textContent = t.l;
+  }
+
+  // ---- draw helpers ----
+  function wobblyCircle(cx, cy, r, prog, time){
+    const SEG = 90, span = Math.PI*2*prog;
+    ctx.beginPath();
+    for(let i=0;i<=SEG;i++){
+      const a = -Math.PI/2 + (i/SEG)*Math.PI*2;
+      if(a + Math.PI/2 > span) break;
+      const wob = Math.sin(a*7 + 1.7)*3 + Math.sin(a*13)*1.5;
+      const x = cx + Math.cos(a)*(r+wob), y = cy + Math.sin(a)*(r+wob);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.setLineDash([10,7]);
+    ctx.lineDashOffset = reduced ? 0 : -time*18;
+    ctx.strokeStyle = 'rgba(255,158,27,0.95)';
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function anchorNode(a, alpha){
+    const x = a.x*W, y = a.y*H;
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = 'rgba(244,239,230,0.85)';
+    ctx.lineWidth = 1.4;
+    const w = 11;
+    ctx.strokeRect(x-w, y-w, w*2, w*2);
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    ctx.fillStyle = 'rgba(244,239,230,0.8)';
+    ctx.textAlign = 'center';
+    ctx.fillText(a.l, x, y + w + 16);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawNetwork(alpha, time, prog){
+    const A = ring();
+    ctx.setLineDash([5,6]);
+    ctx.lineDashOffset = reduced ? 0 : -time*14;
+    for(let i=0;i<A.length;i++){
+      for(let j=i+1;j<A.length;j++){
+        const adjacent = (j === i+1) || (i === 0 && j === A.length-1);
+        ctx.strokeStyle = adjacent
+          ? `rgba(255,158,27,${0.4*alpha})`
+          : `rgba(255,158,27,${0.16*alpha})`;
+        ctx.lineWidth = adjacent ? 1.5 : 1;
+        ctx.beginPath();
+        const ax=A[i].x*W, ay=A[i].y*H, bx=A[j].x*W, by=A[j].y*H;
+        ctx.moveTo(ax,ay);
+        ctx.lineTo(ax + (bx-ax)*prog, ay + (by-ay)*prog);
+        ctx.stroke();
+      }
+    }
+    ctx.setLineDash([]);
+    for(const a of A) anchorNode(a, alpha);
+  }
+
+  function attribLines(prog, time){
+    const A = ring();
+    const R = RESULT();
+    const rx = R.x*W, ry = R.y*H;
+    ctx.setLineDash([6,6]);
+    ctx.lineDashOffset = reduced ? 0 : -time*24;
+    ctx.strokeStyle = 'rgba(255,158,27,0.75)';
+    ctx.lineWidth = 1.5;
+    for(const a of A){
+      const ax = a.x*W, ay = a.y*H + 24;
+      const mx = (ax+rx)/2, my = (ay+ry)/2 + 26;
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      const STEPS = 30;
+      for(let i=1;i<=STEPS*prog;i++){
+        const t = i/STEPS;
+        const x=(1-t)*(1-t)*ax + 2*(1-t)*t*mx + t*t*rx;
+        const y=(1-t)*(1-t)*ay + 2*(1-t)*t*my + t*t*ry;
+        ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    if(prog > 0.85){
+      ctx.globalAlpha = Math.min(1,(prog-0.85)/0.15);
+      ctx.fillStyle = 'rgba(255,158,27,1)';
+      ctx.beginPath(); ctx.arc(rx, ry, 7, 0, Math.PI*2); ctx.fill();
+      ctx.font = '500 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(244,239,230,0.9)';
+      ctx.fillText('REVENUE', rx, ry + 24);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // ---- main loop ----
+  let t0 = performance.now();
+  function frame(now){
+    const time = (now - t0)/1000;
+    readScroll();
+    tickHud();
+
+    ctx.fillStyle = '#12151B';
+    ctx.fillRect(0,0,W,H);
+
+    // scene overlays under dots
+    if(scene === 4){
+      const a = Math.min(1, sceneT*2 + 0.15);
+      drawNetwork(a, time, reduced ? 1 : Math.min(1, sceneT*1.8 + 0.1));
+    }
+    if(scene === 5){ drawNetwork(0.35, time, 1); }
+    if(scene === 6){
+      drawNetwork(0.5, time, 1);
+      attribLines(reduced ? 1 : Math.min(1, sceneT*1.5 + 0.1), time);
+    }
+
+    const driftBase = reduced ? 0 : 1;
+    const lerp = reduced ? 1 : 0.06;
+
+    for(const p of P){
+      p.x += (p.tx - p.x)*lerp;
+      p.y += (p.ty - p.y)*lerp;
+
+      const shaped = (scene===2 && p.fam) || (scene>=3 && p.intent);
+      const wob = driftBase * (shaped ? 0.25 : 1);
+      const dx = Math.sin(time*p.sp + p.ph)*6*wob;
+      const dy = Math.cos(time*p.sp*0.8 + p.ph)*6*wob;
+
+      let r = mobile ? 1.4 : 1.7, col;
+      if(scene === 0){
+        col = 'rgba(120,130,150,0.7)';
+        if(p.intent && sceneT > 0.5){
+          col = `rgba(255,158,27,${0.3*((sceneT-0.5)*2)})`;
+        }
+      } else if(scene === 1){
+        if(p.intent){
+          const pulse = reduced ? 0 : Math.sin(time*3 + p.ph)*0.5+0.5;
+          r += pulse*1.6;
+          col = `rgba(255,158,27,${0.75 + pulse*0.25})`;
+        } else col = `rgba(70,78,95,${0.55 - sceneT*0.3})`;
+      } else if(scene === 2){
+        col = 'rgba(55,62,78,0.16)';
+      } else if(scene === 3){
+        col = p.intent ? 'rgba(255,158,27,0.95)' : 'rgba(55,62,78,0.2)';
+      } else if(scene === 4){
+        if(p.intent){
+          const pulse = reduced ? 0 : Math.sin(time*2.2 + p.ph)*0.5+0.5;
+          col = `rgba(255,184,92,${0.7 + pulse*0.3})`;
+        } else col = 'rgba(55,62,78,0.13)';
+      } else if(scene === 5){
+        if(p.raiser){
+          const converted = reduced || sceneT > p.convAt;
+          if(converted){ col = 'rgba(255,184,92,1)'; r += 0.9; }
+          else {
+            const pulse = Math.sin(time*3.4 + p.ph)*0.5+0.5;
+            col = `rgba(255,158,27,${0.7 + pulse*0.3})`;
+            // halo ring — the raised hand
+            ctx.strokeStyle = `rgba(255,158,27,${0.35 + pulse*0.3})`;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.arc(p.x+dx, p.y+dy, 7 + pulse*3.5, 0, Math.PI*2);
+            ctx.stroke();
+          }
+        } else if(p.intent) col = 'rgba(255,184,92,0.28)';
+        else col = 'rgba(55,62,78,0.1)';
+      } else { // 6
+        if(p.raiser){ col = 'rgba(255,184,92,1)'; r += 0.7; }
+        else if(p.intent) col = 'rgba(255,184,92,0.4)';
+        else col = 'rgba(55,62,78,0.1)';
+      }
+
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(p.x+dx, p.y+dy, r, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // family portrait — thousands of dots split in and settle into the image
+    famAlpha += (((scene === 2 && PPTS) ? 1 : 0) - famAlpha) * (reduced ? 1 : 0.08);
+    if(famAlpha > 0.02 && PPTS){
+      const rScale = mobile ? 0.8 : 1;
+      let curTone = -1;
+      for(const q of FP){
+        q.x += (q.tx - q.x)*lerp;
+        q.y += (q.ty - q.y)*lerp;
+        const ap = reduced ? 1 : Math.max(0, Math.min(1, sceneT*2 - q.st));
+        const a = famAlpha * (scene === 2 ? ap : 1);
+        if(a <= 0.01) continue;
+        const T = TONES[q.pt.tone];
+        if(q.pt.tone !== curTone){
+          ctx.fillStyle = 'rgb(' + T[0] + ',' + T[1] + ',' + T[2] + ')';
+          curTone = q.pt.tone;
+        }
+        ctx.globalAlpha = T[4]*a;
+        const wq = reduced ? 0 : 1.1;
+        const qx = q.x + Math.sin(time*q.sp + q.ph)*wq;
+        const qy = q.y + Math.cos(time*q.sp*0.8 + q.ph)*wq;
+        ctx.beginPath();
+        ctx.arc(qx, qy, T[3]*rScale, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if(scene === 3){
+      const prog = reduced ? 1 : Math.min(1, sceneT*1.6 + 0.15);
+      wobblyCircle(CX()*W, FENCE.y*H, FENCE.r*Math.min(W,H), prog, time);
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
