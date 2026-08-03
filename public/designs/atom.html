@@ -38,6 +38,8 @@ canvas#field{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-ind
 .hud .counter{text-align:right;font-family:'IBM Plex Mono',monospace}
 .hud .counter .num{font-size:20px;font-weight:500;color:var(--orange);letter-spacing:.02em;font-variant-numeric:tabular-nums}
 .hud .counter .lbl{font-size:9px;letter-spacing:.22em;color:rgba(244,239,230,.55);margin-top:2px}
+.hud .srcs{display:flex;flex-direction:column;gap:3px;margin-top:7px;font-size:9px;letter-spacing:.18em;color:rgba(244,239,230,.45);text-align:right;transition:opacity .5s}
+.hud .srcs span::before{content:'· ';color:rgba(255,158,27,.55)}
 /* ---------- floating CTA ---------- */
 .pill{
   position:fixed;right:18px;bottom:18px;z-index:30;
@@ -215,7 +217,14 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   <div class="mark">DIGITAL<span>&nbsp;POINTES</span></div>
   <div class="counter">
     <div class="num" id="hudNum">0</div>
-    <div class="lbl" id="hudLbl">HOUSEHOLDS INDEXED</div>
+    <div class="lbl" id="hudLbl">INTENT SIGNALS</div>
+    <div class="srcs" id="hudSrcs">
+      <span>ONLINE SEARCH</span>
+      <span>SOCIAL MEDIA ACTIVITY</span>
+      <span>TRADE PATTERNS</span>
+      <span>B2C</span>
+      <span>B2B</span>
+    </div>
   </div>
 </div>
 
@@ -741,7 +750,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   const hudNum = document.getElementById('hudNum');
   const hudLbl = document.getElementById('hudLbl');
   const HUD = [
-    {v:2412847, l:'HOUSEHOLDS INDEXED', $:false},
+    {v:0,       l:'INTENT SIGNALS',     $:false}, // hero: live billions counter
     {v:5,       l:'CONNECTED CHANNELS', $:false},
     {v:61204,   l:'INTENT SIGNALS',     $:false},
     {v:38566,   l:'HOMES WITH CHILDREN',$:false},
@@ -750,11 +759,21 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     {v:214700,  l:'ATTRIBUTED REVENUE', $:true}
   ];
   let shown = 0;
+  const hudSrcs = document.getElementById('hudSrcs');
+  const BILL_BASE = 3214006882, BILL_T0 = performance.now();
   function tickHud(){
     const t = HUD[scene];
-    shown = reduced ? t.v : shown + (t.v - shown)*0.08;
-    hudNum.textContent = (t.$ ? '$' : '') + Math.round(shown).toLocaleString('en-US');
+    if(scene === 0){
+      // billions of intent signals — live, always counting
+      shown = BILL_BASE + (reduced ? 0 : Math.floor((performance.now() - BILL_T0)/1000*317));
+      hudNum.textContent = Math.round(shown).toLocaleString('en-US');
+    } else {
+      if(shown > t.v*50) shown = t.v*3;   // coming down off the billions counter
+      shown = reduced ? t.v : shown + (t.v - shown)*0.08;
+      hudNum.textContent = (t.$ ? '$' : '') + Math.round(shown).toLocaleString('en-US');
+    }
     if(hudLbl.textContent !== t.l) hudLbl.textContent = t.l;
+    hudSrcs.style.opacity = scene === 0 ? '1' : '0';
   }
 
   // ---- draw helpers ----
