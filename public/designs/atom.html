@@ -216,8 +216,8 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
 <div class="hud" id="hud">
   <div class="mark">DIGITAL<span>&nbsp;POINTES</span></div>
   <div class="counter">
-    <div class="num" id="hudNum">0</div>
-    <div class="lbl" id="hudLbl">INTENT SIGNALS</div>
+    <div class="num" id="hudNum">BILLIONS</div>
+    <div class="lbl" id="hudLbl">OF INTENT SIGNALS</div>
     <div class="srcs" id="hudSrcs">
       <span>ONLINE SEARCH</span>
       <span>SOCIAL MEDIA ACTIVITY</span>
@@ -750,7 +750,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   const hudNum = document.getElementById('hudNum');
   const hudLbl = document.getElementById('hudLbl');
   const HUD = [
-    {v:0,       l:'INTENT SIGNALS',     $:false}, // hero: live billions counter
+    {v:0,       l:'OF INTENT SIGNALS',  $:false}, // hero: "BILLIONS" wordmark
     {v:5,       l:'CONNECTED CHANNELS', $:false},
     {v:61204,   l:'INTENT SIGNALS',     $:false},
     {v:38566,   l:'HOMES WITH CHILDREN',$:false},
@@ -760,15 +760,12 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   ];
   let shown = 0;
   const hudSrcs = document.getElementById('hudSrcs');
-  const BILL_BASE = 3214006882, BILL_T0 = performance.now();
   function tickHud(){
     const t = HUD[scene];
     if(scene === 0){
-      // billions of intent signals — live, always counting
-      shown = BILL_BASE + (reduced ? 0 : Math.floor((performance.now() - BILL_T0)/1000*317));
-      hudNum.textContent = Math.round(shown).toLocaleString('en-US');
+      shown = 0;
+      if(hudNum.textContent !== 'BILLIONS') hudNum.textContent = 'BILLIONS';
     } else {
-      if(shown > t.v*50) shown = t.v*3;   // coming down off the billions counter
       shown = reduced ? t.v : shown + (t.v - shown)*0.08;
       hudNum.textContent = (t.$ ? '$' : '') + Math.round(shown).toLocaleString('en-US');
     }
