@@ -38,8 +38,6 @@ canvas#field{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-ind
 .hud .counter{text-align:right;font-family:'IBM Plex Mono',monospace}
 .hud .counter .num{font-size:20px;font-weight:500;color:var(--orange);letter-spacing:.02em;font-variant-numeric:tabular-nums}
 .hud .counter .lbl{font-size:9px;letter-spacing:.22em;color:rgba(244,239,230,.55);margin-top:2px}
-.hud .srcs{display:flex;flex-direction:column;gap:3px;margin-top:7px;font-size:9px;letter-spacing:.18em;color:rgba(244,239,230,.45);text-align:right;transition:opacity .5s}
-.hud .srcs span::before{content:'· ';color:rgba(255,158,27,.55)}
 /* ---------- floating CTA ---------- */
 .pill{
   position:fixed;right:18px;bottom:18px;z-index:30;
@@ -126,6 +124,11 @@ h2{font-size:clamp(32px,6.6vw,60px)}
   font-family:'Caveat',cursive;font-weight:600;color:var(--orange-glow);
   font-size:19px;margin-top:8px;text-align:center;transform:rotate(-2deg);
 }
+.fnicon{display:block;margin:0 auto 6px}
+.fni.circled{position:relative;padding:10px 18px}
+.hand-oval{position:absolute;inset:-8px -14px;width:calc(100% + 28px);height:calc(100% + 16px);pointer-events:none;z-index:-1}
+.hand-oval path{stroke-dasharray:620;stroke-dashoffset:620;transition:stroke-dashoffset 1.2s ease}
+.fnote.on .hand-oval path{stroke-dashoffset:0}
 /* ---------- note positions (mobile-first; desktop overrides below) ---------- */
 #n0{top:22vh;right:6vw}
 #n1{top:13vh;right:6vw}
@@ -138,6 +141,7 @@ h2{font-size:clamp(32px,6.6vw,60px)}
 #n8{top:14vh;left:7vw}
 #n9{top:26vh;right:8vw}
 #n10{top:13vh;left:7vw}
+#n11{top:44vh;left:6vw}
 /* ---------- copy legibility: mobile card, desktop left rail ---------- */
 @media (max-width:899px){
   .scene .block{
@@ -168,6 +172,7 @@ h2{font-size:clamp(32px,6.6vw,60px)}
   #n8{top:15vh;left:48vw;right:auto}
   #n9{top:24vh;right:8vw;left:auto}
   #n10{top:13vh;left:48vw;right:auto}
+  #n11{top:68vh;left:48vw;right:auto}
 }
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
 .chip{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;border:1px solid rgba(255,158,27,.5);color:var(--chalk);padding:9px 13px;border-radius:8px;background:rgba(18,21,27,.55)}
@@ -218,13 +223,6 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   <div class="counter">
     <div class="num" id="hudNum">BILLIONS</div>
     <div class="lbl" id="hudLbl">OF INTENT SIGNALS</div>
-    <div class="srcs" id="hudSrcs">
-      <span>ONLINE SEARCH</span>
-      <span>SOCIAL MEDIA ACTIVITY</span>
-      <span>TRADE PATTERNS</span>
-      <span>B2C</span>
-      <span>B2B</span>
-    </div>
   </div>
 </div>
 
@@ -245,8 +243,11 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     </div>
   </div>
   <!-- persists from intent all the way through the geofence draw -->
-  <div class="fnote" id="n2" data-from="2.15" data-to="4.9">
-    <div class="fni" style="transform:rotate(-5deg)">visits the competitor down the street every Friday</div>
+  <div class="fnote" id="n2" data-from="2.15" data-to="2.95">
+    <div class="fni circled" style="transform:rotate(-5deg)"><svg class="fnicon" width="20" height="24" viewBox="0 0 20 24"><path d="M10 1C5.6 1 2 4.4 2 8.5c0 5.6 8 14.5 8 14.5s8-8.9 8-14.5C18 4.4 14.4 1 10 1z" fill="none" stroke="rgba(255,158,27,.8)" stroke-width="1.5"/><circle cx="10" cy="8.5" r="2.8" fill="none" stroke="rgba(255,158,27,.8)" stroke-width="1.5"/></svg>visits a competitor down the street every Friday<svg class="hand-oval" viewBox="0 0 220 90" preserveAspectRatio="none"><path d="M110 5 C165 2, 215 12, 212 30 C216 55, 175 78, 110 82 C50 86, 4 62, 6 40 C3 18, 55 6, 110 5" fill="none" stroke="rgba(255,158,27,.7)" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+  </div>
+  <div class="fnote" id="n11" data-from="3.1" data-to="3.95">
+    <div class="fni" style="transform:rotate(-3deg)"><svg class="fnicon" width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9.5" fill="none" stroke="rgba(255,158,27,.8)" stroke-width="1.4"/><circle cx="11" cy="11" r="6" fill="none" stroke="rgba(255,158,27,.8)" stroke-width="1.3"/><circle cx="11" cy="11" r="2.5" fill="rgba(255,158,27,.8)"/></svg>your message, served to every device in the household</div>
   </div>
   <div class="fnote search" id="n3" data-from="2.3" data-to="2.98">
     <div class="sbar">
@@ -256,7 +257,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     <div class="slabel">a live intent trigger ↑</div>
   </div>
   <div class="fnote" id="n4" data-from="2.5" data-to="2.98">
-    <div class="fni" style="transform:rotate(2deg)">asked the Facebook group for financial advisor recs</div>
+    <div class="fni" style="transform:rotate(2deg)"><svg class="fnicon" width="22" height="20" viewBox="0 0 22 20"><path d="M1 9c0-4.4 4.5-8 10-8s10 3.6 10 8-4.5 8-10 8c-1.3 0-2.5-.2-3.6-.5L3 19v-4.3C1.7 13.1 1 11.2 1 9z" fill="none" stroke="rgba(255,158,27,.8)" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7" cy="9" r="1" fill="rgba(255,158,27,.8)"/><circle cx="11" cy="9" r="1" fill="rgba(255,158,27,.8)"/><circle cx="15" cy="9" r="1" fill="rgba(255,158,27,.8)"/></svg>asked a Facebook group for financial advisor recs</div>
   </div>
   <div class="fnote" id="n5" data-from="3.1" data-to="3.95">
     <div class="fni" style="transform:rotate(3deg)">two kids and a mortgage
@@ -269,14 +270,14 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     </div>
   </div>
   <div class="fnote" id="n7" data-from="1.05" data-to="1.95">
-    <div class="fni" style="transform:rotate(2deg)">no silos — every channel talks to the others</div>
+    <div class="fni" style="transform:rotate(2deg)">every touchpoint, one conversation</div>
   </div>
   <div class="fnote" id="n8" data-from="5.02" data-to="5.95">
-    <div class="fni" style="transform:rotate(-4deg)">clicked the mailer QR ✓</div>
+    <div class="fni" style="transform:rotate(-4deg)">scanned a QR code ✓</div>
   </div>
   <div class="fnote" id="n9" data-from="5.15" data-to="5.95">
-    <div class="fni" style="transform:rotate(3deg)">called, didn't book — yet
-      <svg width="52" height="34" viewBox="0 0 52 34"><path d="M6 4 C 18 14, 30 20, 42 28 M34 26 L42 28 L39 19"/></svg>
+    <div class="fni" style="transform:rotate(3deg)">called, didn't book
+      <svg width="52" height="34" viewBox="0 0 52 34"><path d="M46 4 C 34 14, 22 20, 10 28 M18 26 L10 28 L13 19"/></svg>
     </div>
   </div>
   <div class="fnote" id="n10" data-from="6.05" data-to="6.9">
@@ -289,9 +290,9 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   <div class="pin">
   <div class="block">
     <div class="eyebrow">METRO DETROIT, MI · 42.67°N 82.94°W</div>
-    <h1>Every dot is a household.</h1>
-    <p>Digital Pointes curates audiences from real-world signals — then reaches them on every channel and proves what worked.</p>
-    <div class="cue">scroll — watch what we do with them ↓</div>
+    <h1>Curated audiences online and off.</h1>
+    <p>Digital Pointes curates and activates your best customers across marketing channels and buying signals.</p>
+    <div class="cue">Personalized to your business objectives</div>
   </div>
   </div>
 </section>
@@ -300,9 +301,9 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
 <section class="scene" data-scene="1" style="--rw:220vh">
   <div class="pin">
   <div class="block">
-    <div class="eyebrow">DIGITAL · EMAIL · CTV · SOCIAL MEDIA · DIRECT MAIL</div>
-    <h2>One audience. Every channel, connected.</h2>
-    <p>Display, social media, CTV, email, and direct mail run as one system — the same household, one story, sequenced across every touchpoint. No duplicate spend, no dead ends.</p>
+    <div class="eyebrow">DIGITAL · EMAIL · CTV · SOCIAL MEDIA · DIRECT MAIL · GEOFENCING</div>
+    <h2>Every channel working as one.</h2>
+    <p>Display, social media, CTV, email, direct mail, and geofencing run as one system. The same household, one story, sequenced across every touchpoint. No duplicate spend, no dead ends.</p>
   </div>
   </div>
 </section>
@@ -312,8 +313,8 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   <div class="pin">
   <div class="block">
     <div class="eyebrow">FULL-FUNNEL INTENT TRIGGERS</div>
-    <h2>Some of them are in-market right now.</h2>
-    <p>Searches, site visits, store loyalty, life events, even the questions they ask their community. Our intent triggers surface the households that are actually shopping — before your competitors know they exist.</p>
+    <h2>Your customers are looking for you.</h2>
+    <p>Online searches, website visits, and geo-targeting. We capture live intent triggers to convert before they've gone to a competitor.</p>
   </div>
   </div>
 </section>
@@ -324,7 +325,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   <div class="block">
     <div class="eyebrow">DATA · HOUSEHOLD TARGETING</div>
     <h2>Target the household, not just the device.</h2>
-    <p>Hundreds of attributes per home — kids, income, homeownership, pets, purchase history. Build the exact audience: homeowners with children, five miles out, in-market for you.</p>
+    <p>Hundreds of attributes per home. Kids, income, homeownership, pets, purchase history. Build the exact audience: homeowners with children, five miles out, in-market for you.</p>
   </div>
   </div>
 </section>
@@ -335,7 +336,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   <div class="block">
     <div class="eyebrow">GEOFENCING · CAPTURE</div>
     <h2>We can draw the line anywhere.</h2>
-    <p>A competitor's lot. A conference floor. A carrier route. Devices that cross the fence become an audience you own — and keep.</p>
+    <p>A competitor's lot. A conference floor. A USPS carrier route. Geofencing can find new customers, poach from competitors, or identify people regularly nearby.</p>
   </div>
   </div>
 </section>
@@ -345,8 +346,8 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   <div class="pin">
   <div class="block">
     <div class="eyebrow">HAND RAISERS · IDENTITY · RETARGETING</div>
-    <h2>When a hand goes up, we don't let go.</h2>
-    <p>A site visit, a QR scan, a call, a click — any action flags the household as a hand raiser. Anonymous website visitors get identified and matched back to a real home. Then we stay on them, across every channel, until they convert.</p>
+    <h2>Every signal becomes a next step.</h2>
+    <p>A site visit, a QR scan, a call, a click. Any action flags the household as a hand raiser. Anonymous website visitors get identified and matched back to a real home. Then we stay on them, across every channel, until they convert.</p>
   </div>
   </div>
 </section>
@@ -421,23 +422,25 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   function ring(){
     const cx = CX()*W, cy = .42*H;
     const R = Math.min(W,H) * (portrait ? 0.30 : 0.28);
-    const L = ['DIGITAL','EMAIL','CTV','SOCIAL MEDIA','DIRECT MAIL'];
+    const L = ['DIGITAL','EMAIL','CTV','SOCIAL MEDIA','DIRECT MAIL','GEOFENCING'];
     return L.map((l,i)=>{
-      const a = -Math.PI/2 + i*(Math.PI*2/5);
+      const a = -Math.PI/2 + i*(Math.PI*2/6);
       return { x:(cx+Math.cos(a)*R)/W, y:(cy+Math.sin(a)*R)/H, l };
     });
   }
 
   // ---- particles ----
   const P = [];
+  const DN = Math.round(N * 0.55);
   for(let i=0;i<N;i++){
     const intent = Math.random() < 0.16;
     P.push({
       hx:Math.random(), hy:Math.random(), x:0,y:0, tx:0,ty:0,
       ph:Math.random()*Math.PI*2, sp:0.4+Math.random()*0.8,
       intent,
+      dLogo: i < DN,
       fam: Math.random() < 0.30,
-      ch: (Math.random()*5)|0,
+      ch: (Math.random()*6)|0,
       raiser: intent && Math.random() < 0.28,
       convAt: 0.2 + Math.random()*0.65,
       fa:Math.random()*Math.PI*2, fr:Math.pow(Math.random(),0.6),
@@ -493,6 +496,181 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     img.src = FAMILY_SRC;
   })();
 
+  // ---- neighborhood map targets (portrait morphs into this) ----
+  // organic suburban layout: curved streets, cul-de-sacs, houses along roads
+  let MPTS = null, MAP_PIN = {u:0.50, v:0.45};
+  (function genMap(){
+    const pts = [];
+    const seeded = (s) => () => { s=(s*16807+0)%2147483647; return s/2147483647; };
+    const rng = seeded(42);
+
+    // draw a road as dots along a polyline
+    function road(path, width, density){
+      for(let i=0;i<path.length-1;i++){
+        const x0=path[i][0],y0=path[i][1],x1=path[i+1][0],y1=path[i+1][1];
+        const dx=x1-x0, dy=y1-y0, len=Math.sqrt(dx*dx+dy*dy);
+        if(len<0.001) continue;
+        const nx=-dy/len, ny=dx/len;
+        const steps=Math.max(2,Math.round(len/density));
+        for(let s=0;s<=steps;s++){
+          const t=s/steps;
+          const cx=x0+dx*t, cy=y0+dy*t;
+          for(let w=-1;w<=1;w++){
+            pts.push({u:cx+nx*w*width*(0.3+rng()*0.7)+(rng()-0.5)*0.002,
+                      v:cy+ny*w*width*(0.3+rng()*0.7)+(rng()-0.5)*0.002, zone:'street'});
+          }
+        }
+      }
+      return path;
+    }
+
+    // place houses along a road path, offset to one or both sides
+    function housesAlongRoad(path, spacing, offset, bothSides, litChance){
+      for(let i=0;i<path.length-1;i++){
+        const x0=path[i][0],y0=path[i][1],x1=path[i+1][0],y1=path[i+1][1];
+        const dx=x1-x0, dy=y1-y0, len=Math.sqrt(dx*dx+dy*dy);
+        if(len<0.001) continue;
+        const nx=-dy/len, ny=dx/len;
+        const steps=Math.max(1,Math.round(len/spacing));
+        for(let s=0;s<steps;s++){
+          const t=(s+0.3+rng()*0.4)/steps;
+          if(t>1) continue;
+          const cx=x0+dx*t, cy=y0+dy*t;
+          const sides = bothSides ? [-1,1] : [rng()<0.5?-1:1];
+          for(const side of sides){
+            const hx=cx+nx*side*offset*(0.8+rng()*0.4);
+            const hy=cy+ny*side*offset*(0.8+rng()*0.4);
+            const isLit = rng()<litChance;
+            const nd = 12+Math.floor(rng()*15);
+            const hsz = 0.006+rng()*0.005;
+            const ang = rng()*Math.PI*2;
+            for(let d=0;d<nd;d++){
+              const da=ang+(rng()-0.5)*1.2, dr=rng()*hsz;
+              pts.push({u:hx+Math.cos(da)*dr*(0.6+rng()*0.8),
+                        v:hy+Math.sin(da)*dr*(0.6+rng()*0.8),
+                        zone:isLit?'lit':'house'});
+            }
+            // yard (sparse fill around house)
+            for(let d=0;d<6;d++){
+              pts.push({u:hx+(rng()-0.5)*0.018, v:hy+(rng()-0.5)*0.014, zone:'block'});
+            }
+          }
+        }
+      }
+    }
+
+    // cul-de-sac: stem + circular end, houses around the bulb
+    function culdesac(sx,sy,ang,stemLen,bulbR,litChance){
+      const ex=sx+Math.cos(ang)*stemLen, ey=sy+Math.sin(ang)*stemLen;
+      const stem = [[sx,sy],[ex,ey]];
+      road(stem, 0.005, 0.003);
+      // bulb
+      for(let a=0;a<Math.PI*2;a+=0.08){
+        const bx=ex+Math.cos(a)*bulbR, by=ey+Math.sin(a)*bulbR;
+        pts.push({u:bx+(rng()-0.5)*0.003, v:by+(rng()-0.5)*0.003, zone:'street'});
+      }
+      // houses around bulb
+      const nh=5+Math.floor(rng()*3);
+      for(let h=0;h<nh;h++){
+        const a = (h/nh)*Math.PI*2;
+        const hx=ex+Math.cos(a)*(bulbR+0.02+rng()*0.01);
+        const hy=ey+Math.sin(a)*(bulbR+0.02+rng()*0.01);
+        const isLit=rng()<litChance;
+        const nd=10+Math.floor(rng()*12);
+        for(let d=0;d<nd;d++){
+          pts.push({u:hx+(rng()-0.5)*0.01, v:hy+(rng()-0.5)*0.008, zone:isLit?'lit':'house'});
+        }
+        for(let d=0;d<4;d++){
+          pts.push({u:hx+(rng()-0.5)*0.016, v:hy+(rng()-0.5)*0.013, zone:'block'});
+        }
+      }
+    }
+
+    // curved road helper: quadratic bezier as polyline
+    function curveRoad(x0,y0,cx,cy,x1,y1,segs){
+      const path=[];
+      for(let i=0;i<=segs;i++){
+        const t=i/segs;
+        const u=(1-t)*(1-t)*x0+2*(1-t)*t*cx+t*t*x1;
+        const v=(1-t)*(1-t)*y0+2*(1-t)*t*cy+t*t*y1;
+        path.push([u,v]);
+      }
+      return path;
+    }
+
+    // === MAIN COLLECTOR ROADS (slightly curved, not grid-perfect) ===
+    const mainRd1 = curveRoad(0.03,0.22, 0.50,0.19, 0.97,0.24, 20);
+    road(mainRd1, 0.007, 0.002);
+    const mainRd2 = curveRoad(0.03,0.78, 0.45,0.80, 0.97,0.76, 20);
+    road(mainRd2, 0.007, 0.002);
+    const mainRd3 = curveRoad(0.18,0.04, 0.16,0.50, 0.20,0.96, 20);
+    road(mainRd3, 0.007, 0.002);
+    const mainRd4 = curveRoad(0.82,0.04, 0.84,0.48, 0.80,0.96, 20);
+    road(mainRd4, 0.007, 0.002);
+
+    // === RESIDENTIAL STREETS (curved, branching off main roads) ===
+    // top-left neighborhood
+    const r1 = curveRoad(0.22,0.22, 0.30,0.14, 0.42,0.10, 12);
+    road(r1, 0.004, 0.003); housesAlongRoad(r1, 0.04, 0.025, true, 0.30);
+    const r2 = curveRoad(0.22,0.22, 0.28,0.30, 0.38,0.35, 12);
+    road(r2, 0.004, 0.003); housesAlongRoad(r2, 0.04, 0.025, true, 0.35);
+    culdesac(0.42,0.10, -0.5, 0.06, 0.015, 0.40);
+    culdesac(0.30,0.14, -1.2, 0.05, 0.012, 0.25);
+
+    // top-right neighborhood
+    const r3 = curveRoad(0.82,0.24, 0.72,0.16, 0.58,0.12, 12);
+    road(r3, 0.004, 0.003); housesAlongRoad(r3, 0.04, 0.025, true, 0.35);
+    const r4 = curveRoad(0.82,0.24, 0.74,0.32, 0.62,0.36, 12);
+    road(r4, 0.004, 0.003); housesAlongRoad(r4, 0.035, 0.022, true, 0.30);
+    culdesac(0.58,0.12, -0.8, 0.055, 0.014, 0.45);
+
+    // center neighborhood
+    const r5 = curveRoad(0.20,0.48, 0.35,0.42, 0.50,0.46, 10);
+    road(r5, 0.004, 0.003); housesAlongRoad(r5, 0.035, 0.022, true, 0.40);
+    const r6 = curveRoad(0.50,0.46, 0.60,0.50, 0.80,0.48, 10);
+    road(r6, 0.004, 0.003); housesAlongRoad(r6, 0.035, 0.022, true, 0.35);
+    const r7 = curveRoad(0.40,0.44, 0.42,0.55, 0.38,0.64, 10);
+    road(r7, 0.004, 0.003); housesAlongRoad(r7, 0.04, 0.025, true, 0.30);
+    culdesac(0.38,0.64, 2.5, 0.05, 0.013, 0.50);
+    const r8 = curveRoad(0.60,0.50, 0.58,0.58, 0.62,0.66, 10);
+    road(r8, 0.004, 0.003); housesAlongRoad(r8, 0.04, 0.025, true, 0.35);
+    culdesac(0.62,0.66, 1.8, 0.05, 0.014, 0.30);
+
+    // bottom-left neighborhood
+    const r9 = curveRoad(0.18,0.78, 0.28,0.72, 0.40,0.74, 10);
+    road(r9, 0.004, 0.003); housesAlongRoad(r9, 0.035, 0.022, true, 0.35);
+    const r10 = curveRoad(0.18,0.78, 0.25,0.86, 0.36,0.90, 10);
+    road(r10, 0.004, 0.003); housesAlongRoad(r10, 0.04, 0.025, true, 0.30);
+    culdesac(0.40,0.74, 0.3, 0.055, 0.013, 0.45);
+    culdesac(0.36,0.90, 0.8, 0.05, 0.012, 0.25);
+
+    // bottom-right neighborhood
+    const r11 = curveRoad(0.80,0.76, 0.72,0.82, 0.60,0.80, 10);
+    road(r11, 0.004, 0.003); housesAlongRoad(r11, 0.035, 0.022, true, 0.35);
+    const r12 = curveRoad(0.80,0.76, 0.75,0.88, 0.66,0.92, 10);
+    road(r12, 0.004, 0.003); housesAlongRoad(r12, 0.04, 0.025, true, 0.40);
+    culdesac(0.60,0.80, 2.8, 0.05, 0.014, 0.35);
+
+    // connecting roads between neighborhoods
+    const c1 = curveRoad(0.38,0.35, 0.46,0.38, 0.50,0.46, 8);
+    road(c1, 0.004, 0.003);
+    const c2 = curveRoad(0.62,0.36, 0.56,0.40, 0.50,0.46, 8);
+    road(c2, 0.004, 0.003);
+
+    // background lawn/yard fill across the map area
+    for(let d=0;d<800;d++){
+      pts.push({u:0.05+rng()*0.90, v:0.05+rng()*0.90, zone:'block'});
+    }
+
+    // shuffle
+    for(let i=pts.length-1;i>0;i--){
+      const j=Math.floor(rng()*(i+1));
+      [pts[i],pts[j]]=[pts[j],pts[i]];
+    }
+    MPTS = pts;
+    for(let i=0;i<FN;i++) FP[i].mp = MPTS[i%MPTS.length];
+  })();
+
   // ---- D logo dot formation (hero → scroll dissolve) ----
   const D_SRC = 'https://res.cloudinary.com/dank2mflu/image/upload/e_make_transparent:30/v1776735067/DP_Pulsing_omaq2i.gif';
   let DPTS = null, DASP = 1;
@@ -529,7 +707,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
       DASP = bbW/bbH;
       const pts = [];
       let guard = 0;
-      while(pts.length < N && guard < N*400){
+      while(pts.length < DN && guard < DN*400){
         guard++;
         const px = bx0+Math.random()*bbW, py = by0+Math.random()*bbH;
         const idx = ((py|0)*sw + (px|0))*4;
@@ -539,14 +717,14 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
         pts.push({ u:(px-bx0)/bbW, v:(py-by0)/bbH });
       }
       const base = pts.length||1;
-      while(pts.length < N){
+      while(pts.length < DN){
         const s = pts[pts.length%base];
         pts.push({ u:s.u+(Math.random()-.5)*.012, v:s.v+(Math.random()-.5)*.012 });
       }
       DPTS = pts;
       if(scene === 0){
         const b = dBox();
-        for(let i=0;i<N;i++){
+        for(let i=0;i<DN;i++){
           P[i].tx = b.x + DPTS[i].u*b.w;
           P[i].ty = b.y + DPTS[i].v*b.h;
         }
@@ -604,13 +782,18 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
         } else { p.tx = p.hx*W; p.ty = p.hy*H; }
       }
     }
-    // family pool: split off from existing dots, fly to portrait points
+    // family pool: split off from existing dots, fly to portrait points + map targets
     if(scene === 3 && PPTS){
       for(const q of FP){
         const src = P[(Math.random()*P.length)|0];
         q.x = src.x; q.y = src.y;
         q.tx = bx0 + q.pt.u*boxW;
         q.ty = by0 + q.pt.v*boxH;
+        // map target in same bounding box
+        if(q.mp){
+          q.mx = bx0 + q.mp.u*boxW;
+          q.my = by0 + q.mp.v*boxH;
+        }
       }
     }
   }
@@ -724,7 +907,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     sceneT = f - scene;
     if(scene !== lastScene){ lastScene = scene; assignTargets(); }
     document.getElementById('pill').classList.toggle('show', f > 0.9 && f < 6.6);
-    document.getElementById('hud').style.opacity = f > 6.5 ? '0' : '1';
+    document.getElementById('hud').style.opacity = (f > 6.5 || (scene === 5)) ? '0' : '1';
     for(const n of NOTES){
       n.el.classList.toggle('on', f >= n.from && f <= n.to);
     }
@@ -740,7 +923,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     }
     // search bar types with the scroll
     const q = 'best ' + INDUSTRY + ' in ' + CITY;
-    const st = Math.max(0, Math.min(1, (f - 2.28) / 0.35));
+    const st = Math.max(0, Math.min(1, (f - 2.1) / 0.4));
     const typed = q.slice(0, reduced ? q.length : Math.round(st * q.length));
     if(SBOX.textContent !== typed) SBOX.textContent = typed;
     updateRail(f, y);
@@ -751,26 +934,27 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   const hudLbl = document.getElementById('hudLbl');
   const HUD = [
     {v:0,       l:'OF INTENT SIGNALS',  $:false}, // hero: "BILLIONS" wordmark
-    {v:5,       l:'CONNECTED CHANNELS', $:false},
-    {v:61204,   l:'INTENT SIGNALS',     $:false},
-    {v:38566,   l:'HOMES WITH CHILDREN',$:false},
+    {v:6,       l:'CONNECTED CHANNELS', $:false},
+    {v:10,      l:'PREBUILT INTENT AUDIENCES READY FOR YOU NOW', $:false},
+    {v:250,     l:'HOUSEHOLD ATTRIBUTES', $:false, sfx:'+'},
     {v:8412,    l:'DEVICES IN FENCE',   $:false},
-    {v:1318,    l:'HAND RAISERS',       $:false},
+    {v:0,       l:'',                   $:false, hide:true},
     {v:214700,  l:'ATTRIBUTED REVENUE', $:true}
   ];
   let shown = 0;
-  const hudSrcs = document.getElementById('hudSrcs');
   function tickHud(){
     const t = HUD[scene];
+    const hud = document.getElementById('hud');
+    if(t.hide){ hud.style.opacity = '0'; return; }
+    else if(hud.style.opacity === '0' && scene < 6.5) hud.style.opacity = '1';
     if(scene === 0){
       shown = 0;
       if(hudNum.textContent !== 'BILLIONS') hudNum.textContent = 'BILLIONS';
     } else {
       shown = reduced ? t.v : shown + (t.v - shown)*0.08;
-      hudNum.textContent = (t.$ ? '$' : '') + Math.round(shown).toLocaleString('en-US');
+      hudNum.textContent = (t.$ ? '$' : '') + Math.round(shown).toLocaleString('en-US') + (t.sfx || '');
     }
     if(hudLbl.textContent !== t.l) hudLbl.textContent = t.l;
-    hudSrcs.style.opacity = scene === 0 ? '1' : '0';
   }
 
   // ---- draw helpers ----
@@ -796,39 +980,42 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     const x = a.x*W, y = a.y*H;
     ctx.globalAlpha = alpha;
     ctx.strokeStyle = 'rgba(244,239,230,0.85)';
-    ctx.lineWidth = 1.4;
-    const w = 13;
-    ctx.strokeRect(x-w, y-w, w*2, w*2);
-    // channel icon inside the node square
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.6;
     ctx.beginPath();
-    if(a.l === 'DIGITAL'){            // display / monitor
-      ctx.rect(x-6, y-5.5, 12, 8);
-      ctx.moveTo(x, y+2.5);  ctx.lineTo(x, y+5.5);
-      ctx.moveTo(x-3, y+5.5); ctx.lineTo(x+3, y+5.5);
-    } else if(a.l === 'EMAIL'){       // envelope
-      ctx.rect(x-6, y-4.5, 12, 9);
-      ctx.moveTo(x-6, y-4.5); ctx.lineTo(x, y+1); ctx.lineTo(x+6, y-4.5);
-    } else if(a.l === 'CTV'){         // tv + antenna
-      ctx.rect(x-6, y-2.5, 12, 8);
-      ctx.moveTo(x, y-2.5); ctx.lineTo(x-4, y-6.5);
-      ctx.moveTo(x, y-2.5); ctx.lineTo(x+4, y-6.5);
-    } else if(a.l === 'SOCIAL MEDIA'){ // chat bubble + tail
-      ctx.arc(x, y-0.5, 5.5, -Math.PI*0.85, Math.PI*0.62);
-      ctx.lineTo(x-4.6, y+6.2); ctx.lineTo(x-3.1, y+3.6);
-    } else {                          // DIRECT MAIL — mailbox with flag
-      ctx.moveTo(x-5.5, y+4.5); ctx.lineTo(x-5.5, y-0.5);
-      ctx.arc(x, y-0.5, 5.5, Math.PI, 0);
-      ctx.lineTo(x+5.5, y+4.5); ctx.lineTo(x-5.5, y+4.5);
-      ctx.moveTo(x, y+4.5);   ctx.lineTo(x, y+8.5);
-      ctx.moveTo(x+3, y-5);   ctx.lineTo(x+3, y-9);
-      ctx.lineTo(x+6.5, y-8); ctx.lineTo(x+3, y-7);
+    if(a.l === 'DIGITAL'){            // cursor arrow
+      ctx.moveTo(x-6, y-10); ctx.lineTo(x-6, y+8); ctx.lineTo(x-1, y+4);
+      ctx.lineTo(x+5, y+10); ctx.lineTo(x+7, y+8); ctx.lineTo(x+1, y+2);
+      ctx.lineTo(x+6, y+2); ctx.closePath();
+    } else if(a.l === 'EMAIL'){       // envelope with flap
+      ctx.rect(x-10, y-6, 20, 14);
+      ctx.moveTo(x-10, y-6); ctx.lineTo(x, y+3); ctx.lineTo(x+10, y-6);
+    } else if(a.l === 'CTV'){         // screen with play triangle
+      ctx.rect(x-10, y-7, 20, 14);
+      ctx.moveTo(x-3.5, y-4); ctx.lineTo(x+5, y); ctx.lineTo(x-3.5, y+4); ctx.closePath();
+      ctx.moveTo(x-4, y+7); ctx.lineTo(x+4, y+7);
+    } else if(a.l === 'SOCIAL MEDIA'){ // speech bubble with dots
+      ctx.arc(x, y-2, 8, -Math.PI*0.82, Math.PI*0.55);
+      ctx.lineTo(x-6, y+9); ctx.lineTo(x-3.5, y+4.5);
+      ctx.closePath();
+      ctx.moveTo(x-3, y-2); ctx.arc(x-3, y-2, 1.2, 0, Math.PI*2);
+      ctx.moveTo(x+1, y-2); ctx.arc(x, y-2, 1.2, 0, Math.PI*2);
+      ctx.moveTo(x+4.2, y-2); ctx.arc(x+3, y-2, 1.2, 0, Math.PI*2);
+    } else if(a.l === 'DIRECT MAIL'){  // envelope with letter
+      ctx.rect(x-10, y-3, 20, 14);
+      ctx.moveTo(x-10, y-3); ctx.lineTo(x, y+5); ctx.lineTo(x+10, y-3);
+      ctx.moveTo(x-6, y-3); ctx.lineTo(x-6, y-10); ctx.lineTo(x+6, y-10); ctx.lineTo(x+6, y-3);
+      ctx.moveTo(x-3, y-7); ctx.lineTo(x+3, y-7);
+      ctx.moveTo(x-3, y-5); ctx.lineTo(x+1, y-5);
+    } else {                          // GEOFENCING — location pin
+      ctx.arc(x, y-3, 6.5, Math.PI, 0);
+      ctx.lineTo(x, y+10); ctx.lineTo(x-6.5, y-3);
+      ctx.moveTo(x+3, y-3); ctx.arc(x, y-3, 3, 0, Math.PI*2);
     }
     ctx.stroke();
     ctx.font = '500 9px "IBM Plex Mono", monospace';
     ctx.fillStyle = 'rgba(244,239,230,0.8)';
     ctx.textAlign = 'center';
-    ctx.fillText(a.l, x, y + w + 14);
+    ctx.fillText(a.l, x, y + 24);
     ctx.globalAlpha = 1;
   }
 
@@ -839,19 +1026,16 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
       const x = CX()*W, y = 0.42*H;
       ctx.globalAlpha = alpha;
       ctx.strokeStyle = 'rgba(255,158,27,0.9)';
-      ctx.lineWidth = 1.4;
-      const hw = 16;
-      ctx.strokeRect(x-hw, y-hw, hw*2, hw*2);
-      ctx.lineWidth = 1.2;
+      ctx.lineWidth = 1.6;
       ctx.beginPath();
-      ctx.moveTo(x-7, y-1);   ctx.lineTo(x, y-7.5);    ctx.lineTo(x+7, y-1);      // roof
-      ctx.moveTo(x-5, y-2);   ctx.lineTo(x-5, y+7);    ctx.lineTo(x+5, y+7); ctx.lineTo(x+5, y-2); // walls
-      ctx.moveTo(x-1.5, y+7); ctx.lineTo(x-1.5, y+2.5); ctx.lineTo(x+1.5, y+2.5); ctx.lineTo(x+1.5, y+7); // door
+      ctx.moveTo(x-10, y-1);  ctx.lineTo(x, y-10);     ctx.lineTo(x+10, y-1);      // roof
+      ctx.moveTo(x-7, y-2);   ctx.lineTo(x-7, y+9);    ctx.lineTo(x+7, y+9); ctx.lineTo(x+7, y-2); // walls
+      ctx.moveTo(x-2, y+9);   ctx.lineTo(x-2, y+3);    ctx.lineTo(x+2, y+3); ctx.lineTo(x+2, y+9); // door
       ctx.stroke();
       ctx.font = '500 9px "IBM Plex Mono", monospace';
       ctx.fillStyle = 'rgba(255,158,27,0.85)';
       ctx.textAlign = 'center';
-      ctx.fillText('THE HOUSEHOLD', x, y + hw + 14);
+      ctx.fillText('THE HOUSEHOLD', x, y + 26);
       ctx.globalAlpha = 1;
     }
   }
@@ -909,11 +1093,11 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     ctx.fillStyle = '#12151B';
     ctx.fillRect(0,0,W,H);
 
-    // D logo → field dissolve during Scene 0
+    // D logo → field dissolve during Scene 0 (only dLogo particles)
     if(DPTS && scene === 0){
       const blend = Math.min(1, Math.max(0, (sceneT - 0.25) / 0.4));
       const b = dBox();
-      for(let i = 0; i < N; i++){
+      for(let i = 0; i < DN; i++){
         const lx = b.x + DPTS[i].u * b.w;
         const ly = b.y + DPTS[i].v * b.h;
         P[i].tx = lx + (P[i].hx*W - lx) * blend;
@@ -939,8 +1123,8 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
         if(h !== p.lastHop){
           p.lastHop = h;
           if(p.atHub){
-            let nc = (Math.random()*5)|0;
-            if(nc === p.ch) nc = (nc + 1 + ((Math.random()*4)|0)) % 5;
+            let nc = (Math.random()*6)|0;
+            if(nc === p.ch) nc = (nc + 1 + ((Math.random()*5)|0)) % 6;
             p.ch = nc;
             const a = A[nc];
             p.tx = a.x*W + (Math.random()-0.5)*(mobile?56:90);
@@ -966,7 +1150,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
       p.x += (p.tx - p.x)*lerp;
       p.y += (p.ty - p.y)*lerp;
 
-      const inDLogo = DPTS && scene === 0 && sceneT < 0.65;
+      const inDLogo = p.dLogo && DPTS && scene === 0 && sceneT < 0.65;
       const shaped = inDLogo || (scene===1 && p.intent) || (scene===3 && p.fam) || (scene>=4 && p.intent);
       const wob = driftBase * (shaped ? 0.25 : 1);
       const dx = Math.sin(time*p.sp + p.ph)*6*wob;
@@ -985,17 +1169,17 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
 
       let r = mobile ? 1.4 : 1.7, col;
       if(scene === 0){
-        if(DPTS){
+        if(p.dLogo && DPTS){
           const dB = Math.min(1, Math.max(0, (sceneT - 0.25) / 0.4));
           if(dB < 1){
             const pul = reduced ? 0.9 : 0.85 + Math.sin(time*2.5 + p.ph)*0.15;
             r = (mobile ? 1.5 : 1.8) + (1-dB)*0.7;
             col = 'rgba(255,158,27,' + (0.35 + (1-dB)*pul*0.65).toFixed(2) + ')';
           } else {
-            col = 'rgba(120,130,150,0.7)';
+            col = 'rgba(70,78,95,0.45)';
           }
         } else {
-          col = 'rgba(120,130,150,0.7)';
+          col = 'rgba(70,78,95,0.45)';
         }
         if(p.intent && sceneT > 0.5){
           col = `rgba(255,158,27,${0.3*((sceneT-0.5)*2)})`;
@@ -1043,24 +1227,47 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
       ctx.fill();
     }
 
-    // family portrait — thousands of dots split in and settle into the image
+    // family portrait → neighborhood map morph
     famAlpha += (((scene === 3 && PPTS) ? 1 : 0) - famAlpha) * (reduced ? 1 : 0.08);
     if(famAlpha > 0.02 && PPTS){
       const rScale = mobile ? 0.8 : 1;
-      let curTone = -1;
+      const mapBlend = scene === 3 ? Math.max(0, Math.min(1, (sceneT - 0.55) / 0.30)) : 0;
+      // zone color lookup: [r, g, b, alpha, radius]
+      const ZCOL = {
+        street: [200,205,215, 0.7, 0.85],
+        block:  [ 60, 66, 80, 0.25, 0.8],
+        house:  [150,155,168, 0.6, 1.1],
+        lit:    [255,158, 27, 1.0, 1.4]
+      };
+      let curFill = '';
       for(const q of FP){
-        q.x += (q.tx - q.x)*lerp;
-        q.y += (q.ty - q.y)*lerp;
-        const ap = reduced ? 1 : Math.max(0, Math.min(1, sceneT*2 - q.st));
+        const effTx = q.mp ? q.tx + (q.mx - q.tx)*mapBlend : q.tx;
+        const effTy = q.mp ? q.ty + (q.my - q.ty)*mapBlend : q.ty;
+        q.x += (effTx - q.x)*lerp;
+        q.y += (effTy - q.y)*lerp;
+        const ap = reduced ? 1 : Math.max(0, Math.min(1, sceneT*3.2 - q.st));
         const a = famAlpha * (scene === 3 ? ap : 1);
         if(a <= 0.01) continue;
-        const T = TONES[q.pt.tone];
-        if(q.pt.tone !== curTone){
-          ctx.fillStyle = 'rgb(' + T[0] + ',' + T[1] + ',' + T[2] + ')';
-          curTone = q.pt.tone;
+
+        let fillCol, dotAlpha, dotR;
+        if(mapBlend < 0.01){
+          const T = TONES[q.pt.tone];
+          fillCol = 'rgb(' + T[0] + ',' + T[1] + ',' + T[2] + ')';
+          dotAlpha = T[4]*a; dotR = T[3]*rScale;
+        } else {
+          const T = TONES[q.pt.tone];
+          const z = q.mp ? (ZCOL[q.mp.zone] || ZCOL.block) : ZCOL.block;
+          const mb = mapBlend > 0.99 ? 1 : mapBlend;
+          fillCol = 'rgb(' + Math.round(T[0]+(z[0]-T[0])*mb) + ',' +
+                    Math.round(T[1]+(z[1]-T[1])*mb) + ',' +
+                    Math.round(T[2]+(z[2]-T[2])*mb) + ')';
+          dotAlpha = (T[4] + (z[3] - T[4])*mb)*a;
+          dotR = (T[3] + (z[4] - T[3])*mb)*rScale;
         }
-        ctx.globalAlpha = T[4]*a;
-        const wq = reduced ? 0 : 0.3;
+
+        if(fillCol !== curFill){ ctx.fillStyle = fillCol; curFill = fillCol; }
+        ctx.globalAlpha = dotAlpha;
+        const wq = reduced ? 0 : 0.3*(1 - mapBlend*0.7);
         let qx = q.x + Math.sin(time*q.sp + q.ph)*wq;
         let qy = q.y + Math.cos(time*q.sp*0.8 + q.ph)*wq;
         if(CURSOR){
@@ -1068,12 +1275,46 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
           const d2 = vx*vx + vy*vy;
           if(d2 < 48400){
             const d = Math.sqrt(d2) || 1;
-            const pull = (1 - d/220) * 4;   // portrait dots barely lean in
+            const pull = (1 - d/220) * 4;
             qx += vx/d*pull; qy += vy/d*pull;
           }
         }
         ctx.beginPath();
-        ctx.arc(qx, qy, T[3]*rScale, 0, Math.PI*2);
+        ctx.arc(qx, qy, dotR, 0, Math.PI*2);
+        ctx.fill();
+      }
+      // location pin on top of map
+      if(mapBlend > 0.15){
+        const pinAlpha = Math.min(1, (mapBlend - 0.15) / 0.3) * famAlpha;
+        const maxBW = rail() ? W*0.52 : W*0.94;
+        const fMin = Math.min(W,H);
+        let bH = fMin*0.78, bW = bH*PASPECT;
+        if(bW > maxBW){ bW = maxBW; bH = bW/PASPECT; }
+        const bx0 = CX()*W - bW/2, by0 = rail() ? H*0.14 : H*0.10;
+        const px = bx0 + MAP_PIN.u*bW, py = bx0 !== undefined ? by0 + MAP_PIN.v*bH : 0;
+        const ps = mobile ? 14 : 20;
+        ctx.globalAlpha = pinAlpha;
+        // pin shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        ctx.beginPath();
+        ctx.ellipse(px+2, py+ps*1.6+2, ps*0.5, ps*0.15, 0, 0, Math.PI*2);
+        ctx.fill();
+        // pin body
+        ctx.fillStyle = 'rgb(255,158,27)';
+        ctx.beginPath();
+        ctx.arc(px, py, ps, Math.PI, 0);
+        ctx.lineTo(px, py + ps*1.6);
+        ctx.closePath();
+        ctx.fill();
+        // pin inner circle
+        ctx.fillStyle = 'rgb(30,33,43)';
+        ctx.beginPath();
+        ctx.arc(px, py, ps*0.45, 0, Math.PI*2);
+        ctx.fill();
+        // pin highlight
+        ctx.fillStyle = 'rgba(255,200,100,0.4)';
+        ctx.beginPath();
+        ctx.arc(px - ps*0.2, py - ps*0.2, ps*0.22, 0, Math.PI*2);
         ctx.fill();
       }
       ctx.globalAlpha = 1;
