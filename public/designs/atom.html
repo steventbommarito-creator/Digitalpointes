@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Digital Pointes — Engagement Through Data</title>
+<title>Digital Pointes | Engagement Through Data</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Caveat:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -140,8 +140,11 @@ h2{font-size:clamp(32px,6.6vw,60px)}
 #n7{top:12vh;right:5vw}
 #n8{top:14vh;left:7vw}
 #n9{top:26vh;right:8vw}
-#n10{top:13vh;left:7vw}
 #n11{top:44vh;left:6vw}
+#n12{top:52vh;right:6vw}
+#n13{top:62vh;left:7vw}
+#n14{top:38vh;left:8vw}
+#n15{top:70vh;right:7vw}
 /* ---------- copy legibility: mobile card, desktop left rail ---------- */
 @media (max-width:899px){
   .scene .block{
@@ -171,8 +174,11 @@ h2{font-size:clamp(32px,6.6vw,60px)}
   #n7{top:11vh;right:8vw;left:auto}
   #n8{top:15vh;left:48vw;right:auto}
   #n9{top:24vh;right:8vw;left:auto}
-  #n10{top:13vh;left:48vw;right:auto}
   #n11{top:68vh;left:48vw;right:auto}
+  #n12{top:56vh;right:6vw;left:auto}
+  #n13{top:68vh;left:42vw;right:auto}
+  #n14{top:28vh;left:42vw;right:auto}
+  #n15{top:76vh;right:8vw;left:auto}
 }
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
 .chip{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;border:1px solid rgba(255,158,27,.5);color:var(--chalk);padding:9px 13px;border-radius:8px;background:rgba(18,21,27,.55)}
@@ -197,8 +203,6 @@ section.paper{
 .btn{background:var(--orange);color:var(--char);text-decoration:none;font-weight:900;font-size:16px;padding:17px 30px;border-radius:12px;box-shadow:0 8px 26px rgba(255,158,27,.4);transition:transform .2s;display:inline-block}
 .btn:hover{transform:translateY(-2px)}
 .btn:focus-visible{outline:3px solid var(--char);outline-offset:3px}
-.contact{font-family:'IBM Plex Mono',monospace;font-size:13px;color:#3B3F49;line-height:1.9}
-.contact a{color:#C97300;text-decoration:none}
 .signoff{font-family:'Caveat',cursive;font-weight:600;font-size:30px;color:#C97300;margin-top:56px;transform:rotate(-2deg)}
 .signoff .under{display:block;width:180px;margin-top:2px}
 .signoff .under path{stroke:#C97300;stroke-width:2.4;fill:none;stroke-linecap:round}
@@ -207,10 +211,89 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   .scene .pin{padding-bottom:12vh}
   .note{max-width:160px}
 }
+/* ---------- apply modal ---------- */
+.apply-overlay{
+  position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+}
+.apply-overlay.open{opacity:1;pointer-events:auto}
+.apply-backdrop{position:absolute;inset:0;background:rgba(12,14,20,.55);backdrop-filter:blur(8px)}
+.apply-box{
+  position:relative;width:94vw;max-width:520px;
+  background:var(--paper);border:none;border-radius:20px;
+  padding:36px 28px 32px;overflow:hidden;
+  box-shadow:0 24px 64px rgba(12,14,20,.25),0 0 0 1px rgba(12,14,20,.06);
+  transform:translateY(24px) scale(.97);transition:transform .45s cubic-bezier(.22,1,.36,1);
+}
+.apply-overlay.open .apply-box{transform:none}
+.apply-close{
+  position:absolute;top:14px;right:16px;background:none;border:none;
+  color:rgba(28,31,38,.35);font-size:22px;cursor:pointer;z-index:2;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;transition:background .2s,color .2s;
+}
+.apply-close:hover{background:rgba(28,31,38,.06);color:var(--char)}
+.apply-progress{display:flex;gap:8px;justify-content:center;margin-bottom:28px}
+.apply-dot{width:8px;height:8px;border-radius:50%;background:rgba(28,31,38,.12);transition:background .4s,transform .4s}
+.apply-dot.active{background:var(--orange);transform:scale(1.3)}
+.apply-dot.done{background:rgba(255,158,27,.45)}
+#applyCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.apply-step{display:none;position:relative;z-index:2}
+.apply-step.active{display:block;animation:stepIn .5s ease both}
+@keyframes stepIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.apply-step h3{font-size:22px;font-weight:900;color:var(--char);margin-bottom:20px;font-variation-settings:'wdth' 90}
+.apply-field{margin-bottom:16px}
+.apply-field label{
+  display:block;font-family:'Archivo',sans-serif;font-size:13px;
+  font-weight:600;color:rgba(28,31,38,.55);margin-bottom:6px;
+}
+.apply-field input,.apply-field select{
+  width:100%;background:#fff;border:1px solid rgba(28,31,38,.12);
+  border-radius:10px;padding:12px 14px;color:var(--char);font-family:'Archivo',sans-serif;
+  font-size:15px;outline:none;transition:border-color .25s;
+}
+.apply-field input::placeholder{color:rgba(28,31,38,.3)}
+.apply-field input:focus{border-color:var(--orange)}
+.apply-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.apply-row{grid-template-columns:1fr}}
+.apply-chips{display:flex;flex-wrap:wrap;gap:7px}
+.ac{
+  font-family:'Archivo',sans-serif;font-size:13px;font-weight:500;
+  border:1px solid rgba(28,31,38,.12);color:rgba(28,31,38,.6);
+  padding:8px 14px;border-radius:8px;background:#fff;
+  cursor:pointer;transition:all .2s;
+}
+.ac:hover{border-color:var(--orange);color:var(--char)}
+.ac.sel{background:rgba(255,158,27,.1);border-color:var(--orange);color:var(--char);font-weight:600}
+.apply-btns{display:flex;gap:12px;margin-top:24px}
+.apply-next{
+  flex:1;background:var(--orange);color:var(--char);border:none;
+  font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;
+  padding:14px 24px;border-radius:10px;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;
+}
+.apply-next:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,158,27,.35)}
+.apply-back{
+  background:none;border:1px solid rgba(28,31,38,.12);color:rgba(28,31,38,.5);
+  font-family:'Archivo',sans-serif;font-weight:600;font-size:14px;
+  padding:14px 20px;border-radius:10px;cursor:pointer;transition:border-color .2s,color .2s;
+}
+.apply-back:hover{border-color:rgba(28,31,38,.3);color:var(--char)}
+.apply-done{text-align:center;padding:20px 0 10px}
+.apply-check{
+  width:56px;height:56px;border-radius:50%;background:rgba(255,158,27,.12);
+  color:var(--orange);font-size:28px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+  animation:checkPop .5s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes checkPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.apply-done p{color:rgba(28,31,38,.55);font-size:15px;line-height:1.55;margin-top:10px;max-width:40ch;margin-left:auto;margin-right:auto}
+.apply-done .apply-next{margin-top:24px;max-width:200px}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .scene .block,.fnote,.pill,#rail,#railDot,#rail .rt,#rail .rt.major::before,#rail .lbl{transition:none}
   .fnote,.caret{animation:none}
+  .apply-overlay,.apply-box,.apply-dot,.apply-step,.apply-check{transition:none;animation:none}
 }
 </style>
 </head>
@@ -226,7 +309,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   </div>
 </div>
 
-<a class="pill" id="pill" href="#contact">Build your audience ↗</a>
+<button class="pill" id="pill" type="button">Apply to work with us ↗</button>
 
 <nav id="rail" aria-label="Section progress"></nav>
 
@@ -280,8 +363,21 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
       <svg width="52" height="34" viewBox="0 0 52 34"><path d="M46 4 C 34 14, 22 20, 10 28 M18 26 L10 28 L13 19"/></svg>
     </div>
   </div>
-  <div class="fnote" id="n10" data-from="6.05" data-to="6.9">
-    <div class="fni" style="transform:rotate(-4deg)">sample numbers — yours come from your dashboard</div>
+  <div class="fnote" id="n12" data-from="5.08" data-to="5.95">
+    <div class="fni" style="transform:rotate(-3deg)">visited your site 3x this week
+      <svg width="42" height="30" viewBox="0 0 42 30"><path d="M36 4 C 26 12, 18 18, 8 26 M14 24 L8 26 L11 18"/></svg>
+    </div>
+  </div>
+  <div class="fnote" id="n13" data-from="5.20" data-to="5.95">
+    <div class="fni" style="transform:rotate(2deg)">opened every email
+      <svg width="42" height="28" viewBox="0 0 42 28"><path d="M6 4 C 16 12, 24 18, 34 24 M28 22 L34 24 L31 16"/></svg>
+    </div>
+  </div>
+  <div class="fnote" id="n14" data-from="5.12" data-to="5.95">
+    <div class="fni" style="transform:rotate(-2deg)">searched your brand name</div>
+  </div>
+  <div class="fnote" id="n15" data-from="5.25" data-to="5.95">
+    <div class="fni" style="transform:rotate(4deg)">watched 90% of the ad</div>
   </div>
 </div>
 
@@ -352,47 +448,80 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   </div>
 </section>
 
-<!-- 6 — ATTRIBUTION -->
-<section class="scene" data-scene="6" style="--rw:200vh">
-  <div class="pin">
-  <div class="block">
-    <div class="eyebrow">MEASUREMENT · ATTRIBUTION · OPTIMIZATION</div>
-    <h2>Then we prove it — down to the household.</h2>
-    <p>Household-level match-back, even on saturation and broad-reach campaigns. Foot-traffic lift, pixels, promo codes — every dollar traced from impression to revenue, in reports you can actually read.</p>
-    <div class="chips">
-      <div class="chip">SATURATION MATCH-BACK <b>HH-LEVEL</b></div>
-      <div class="chip">STORE VISITS <b>+38%</b></div>
-      <div class="chip">ROAS <b>5.2×</b></div>
+
+<!-- APPLY MODAL -->
+<div class="apply-overlay" id="applyModal">
+  <div class="apply-backdrop"></div>
+  <div class="apply-box">
+    <canvas id="applyCanvas"></canvas>
+    <button class="apply-close" id="applyClose" type="button">&times;</button>
+    <div class="apply-progress">
+      <div class="apply-dot active"></div>
+      <div class="apply-dot"></div>
+      <div class="apply-dot"></div>
+    </div>
+    <div class="apply-step active" data-step="1">
+      <h3>Let's start with you.</h3>
+      <div class="apply-field"><label>Your name</label><input type="text" id="apName" placeholder="First and last"></div>
+      <div class="apply-field"><label>Best email</label><input type="email" id="apEmail" placeholder="you@company.com"></div>
+      <div class="apply-field"><label>Phone</label><input type="tel" id="apPhone" placeholder="(555) 555-5555"></div>
+      <button class="apply-next" id="apNext1" type="button">Next</button>
+    </div>
+    <div class="apply-step" data-step="2">
+      <h3>Now, your business.</h3>
+      <div class="apply-field"><label>Company name</label><input type="text" id="apBiz" placeholder="Your company"></div>
+      <div class="apply-row">
+        <div class="apply-field"><label>Industry</label><input type="text" id="apInd" placeholder="e.g. HVAC, Roofing"></div>
+        <div class="apply-field"><label>Website</label><input type="text" id="apWeb" placeholder="yoursite.com"></div>
+      </div>
+      <div class="apply-field"><label>Team size</label>
+        <div class="apply-chips" data-group="emp">
+          <button type="button" class="ac">1-10</button><button type="button" class="ac">11-25</button><button type="button" class="ac">26-50</button><button type="button" class="ac">51-100</button><button type="button" class="ac">100+</button>
+        </div>
+      </div>
+      <div class="apply-field"><label>Monthly ad budget</label>
+        <div class="apply-chips" data-group="bud">
+          <button type="button" class="ac">$0-5K</button><button type="button" class="ac">$5-10K</button><button type="button" class="ac">$10-20K</button><button type="button" class="ac">$20-50K</button><button type="button" class="ac">$50-100K</button><button type="button" class="ac">$100K+</button>
+        </div>
+      </div>
+      <div class="apply-btns">
+        <button class="apply-back" id="apBack2" type="button">Back</button>
+        <button class="apply-next" id="apNext2" type="button">Submit</button>
+      </div>
+    </div>
+    <div class="apply-step" data-step="3">
+      <div class="apply-done">
+        <div class="apply-check">&#10003;</div>
+        <h3>Application received.</h3>
+        <p>We're only taking on a limited number of new clients right now. Our team is reviewing your info and will reach out if it looks like a good fit.</p>
+        <button class="apply-next" id="apDone" type="button">Close</button>
+      </div>
     </div>
   </div>
-  </div>
-</section>
+</div>
 
-<!-- 7 — HUMAN / PAPER -->
+<!-- HUMAN / PAPER -->
 <section class="paper" id="contact">
   <div class="inner">
     <div class="eyebrow">THE PART THE DATA CAN'T DO</div>
     <h2>Data does the targeting.<br>People do the work.</h2>
-    <p class="lede">No black box, no bloated retainer. A small team on call builds the plan, runs every channel, and walks you through the numbers in plain English — backed by AI chat and phone receptionists so no lead ever rings out. Rooted in client satisfaction, priced for any budget.</p>
+    <p class="lede">No black box, no bloated retainer. A small team on call builds the plan, runs every channel, and walks you through the numbers in plain English, backed by AI chat and phone receptionists so no lead ever rings out. Rooted in client satisfaction, priced for any budget.</p>
 
     <div class="offers">
-      <div class="offer"><span class="tag">MOVERS</span><h3>Predictive Movers</h3><p>Online and offline triggers spot households likely to move — before they list.</p></div>
-      <div class="offer"><span class="tag">MAIL + DIGITAL</span><h3>Digital Carrier Routes</h3><p>Saturation mail with a digital overlay — and household-level attribution on every route.</p></div>
+      <div class="offer"><span class="tag">MOVERS</span><h3>Predictive Movers</h3><p>Online and offline triggers spot households likely to move before they list.</p></div>
+      <div class="offer"><span class="tag">MAIL + DIGITAL</span><h3>Digital Carrier Routes</h3><p>Saturation mail with a digital overlay and household-level attribution on every route.</p></div>
       <div class="offer"><span class="tag">CAPTURE</span><h3>Conquest &amp; Capture</h3><p>Win customers from complementary and competitive locations.</p></div>
       <div class="offer"><span class="tag">RETENTION</span><h3>Loyalty Ads</h3><p>Re-engage anonymous foot traffic and turn visits into repeat patrons.</p></div>
       <div class="offer"><span class="tag">AI AGENTS</span><h3>AI Receptionists</h3><p>Chat and voice agents answer every call and message, book the appointment, and hand off warm leads.</p></div>
       <div class="offer"><span class="tag">IDENTITY</span><h3>Visitor Identity</h3><p>Anonymous website traffic identified and matched to real households for follow-up.</p></div>
+      <div class="offer"><span class="tag">AUDIENCES</span><h3>Intent Audience Creation</h3><p>Prebuilt audience segments combining intent signals, household data, and behavioral triggers. Ready to activate on day one.</p></div>
     </div>
 
     <div class="cta-row">
-      <a class="btn" href="mailto:Sales@digitalpointes.com">Build your audience</a>
-      <div class="contact">
-        <a href="tel:5862658858">586.265.8858</a><br>
-        <a href="mailto:Sales@digitalpointes.com">Sales@digitalpointes.com</a>
-      </div>
+      <button class="btn" id="openApply" type="button">Apply to work with us</button>
     </div>
 
-    <div class="signoff">— the Digital Pointes team
+    <div class="signoff">the Digital Pointes team
       <svg class="under" viewBox="0 0 180 12"><path d="M2 8 C 40 2, 90 12, 178 5"/></svg>
     </div>
 
@@ -763,22 +892,12 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
         } else { p.tx = p.hx*W; p.ty = p.hy*H; }
       } else if(scene === 5){ // hand raisers
         if(p.raiser){
-          const a = Math.random()*Math.PI*2, rr = Math.sqrt(Math.random())*(mobile?70:110);
+          const a = Math.random()*Math.PI*2, rr = Math.sqrt(Math.random())*(mobile?110:180);
           p.tx = CX()*W + Math.cos(a)*rr;
           p.ty = 0.42*H + Math.sin(a)*rr;
         } else if(p.intent){
           p.tx = fx + Math.cos(p.fa)*frr*0.82*p.fr;
           p.ty = fy + Math.sin(p.fa)*frr*0.82*p.fr;
-        } else { p.tx = p.hx*W; p.ty = p.hy*H; }
-      } else { // 6 — attribution
-        if(p.raiser){
-          const a = Math.random()*Math.PI*2, rr = Math.sqrt(Math.random())*(mobile?34:50);
-          p.tx = R.x*W + Math.cos(a)*rr;
-          p.ty = (R.y-0.07)*H + Math.sin(a)*rr;
-        } else if(p.intent){
-          const a = anchors[p.ch];
-          p.tx = a.x*W + (Math.random()-0.5)*(mobile?56:90);
-          p.ty = a.y*H + (Math.random()-0.5)*(mobile?40:60);
         } else { p.tx = p.hx*W; p.ty = p.hy*H; }
       }
     }
@@ -844,7 +963,7 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
   window.addEventListener('load', measureSections);
 
   // ---- scroll rail: tick ruler with section jump ----
-  const RAIL_NAMES = ['Intro','Channels','Intent Signals','Household Targeting','Geofencing','Hand Raisers','Attribution','Contact'];
+  const RAIL_NAMES = ['Intro','Channels','Intent Signals','Household Targeting','Geofencing','Hand Raisers','Contact'];
   const railEl = document.getElementById('rail');
   const railItems = SCENES.concat([document.getElementById('contact')]);
   const railMajors = [];
@@ -902,12 +1021,12 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
       if(y < SM[i].top) break;
       f = i + Math.min(1, (y - SM[i].top) / SM[i].span);
     }
-    f = Math.max(0, Math.min(7, f));
-    scene = Math.min(6, Math.floor(f));
+    f = Math.max(0, Math.min(6, f));
+    scene = Math.min(5, Math.floor(f));
     sceneT = f - scene;
     if(scene !== lastScene){ lastScene = scene; assignTargets(); }
-    document.getElementById('pill').classList.toggle('show', f > 0.9 && f < 6.6);
-    document.getElementById('hud').style.opacity = (f > 6.5 || (scene === 5)) ? '0' : '1';
+    document.getElementById('pill').classList.toggle('show', f > 0.9 && f < 5.6);
+    document.getElementById('hud').style.opacity = (f > 5.5 || (scene === 5)) ? '0' : '1';
     for(const n of NOTES){
       n.el.classList.toggle('on', f >= n.from && f <= n.to);
     }
@@ -938,15 +1057,14 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     {v:10,      l:'PREBUILT INTENT AUDIENCES READY FOR YOU NOW', $:false},
     {v:250,     l:'HOUSEHOLD ATTRIBUTES', $:false, sfx:'+'},
     {v:8412,    l:'DEVICES IN FENCE',   $:false},
-    {v:0,       l:'',                   $:false, hide:true},
-    {v:214700,  l:'ATTRIBUTED REVENUE', $:true}
+    {v:0,       l:'',                   $:false, hide:true}
   ];
   let shown = 0;
   function tickHud(){
     const t = HUD[scene];
     const hud = document.getElementById('hud');
     if(t.hide){ hud.style.opacity = '0'; return; }
-    else if(hud.style.opacity === '0' && scene < 6.5) hud.style.opacity = '1';
+    else if(hud.style.opacity === '0' && scene < 5.5) hud.style.opacity = '1';
     if(scene === 0){
       shown = 0;
       if(hudNum.textContent !== 'BILLIONS') hudNum.textContent = 'BILLIONS';
@@ -1040,41 +1158,6 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     }
   }
 
-  function attribLines(prog, time){
-    const A = ring();
-    const R = RESULT();
-    const rx = R.x*W, ry = R.y*H;
-    ctx.setLineDash([6,6]);
-    ctx.lineDashOffset = reduced ? 0 : -time*24;
-    ctx.strokeStyle = 'rgba(255,158,27,0.75)';
-    ctx.lineWidth = 1.5;
-    for(const a of A){
-      const ax = a.x*W, ay = a.y*H + 24;
-      const mx = (ax+rx)/2, my = (ay+ry)/2 + 26;
-      ctx.beginPath();
-      ctx.moveTo(ax, ay);
-      const STEPS = 30;
-      for(let i=1;i<=STEPS*prog;i++){
-        const t = i/STEPS;
-        const x=(1-t)*(1-t)*ax + 2*(1-t)*t*mx + t*t*rx;
-        const y=(1-t)*(1-t)*ay + 2*(1-t)*t*my + t*t*ry;
-        ctx.lineTo(x,y);
-      }
-      ctx.stroke();
-    }
-    ctx.setLineDash([]);
-    if(prog > 0.85){
-      ctx.globalAlpha = Math.min(1,(prog-0.85)/0.15);
-      ctx.fillStyle = 'rgba(255,158,27,1)';
-      ctx.beginPath(); ctx.arc(rx, ry, 7, 0, Math.PI*2); ctx.fill();
-      ctx.font = '500 11px "IBM Plex Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(244,239,230,0.9)';
-      ctx.fillText('REVENUE', rx, ry + 24);
-      ctx.globalAlpha = 1;
-    }
-  }
-
   // ---- cursor influence (dots drift gently toward the pointer) ----
   let mx = -1e5, my = -1e5, smx = -1e5, smy = -1e5;
   window.addEventListener('mousemove', e => {
@@ -1107,11 +1190,6 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
 
     // scene overlays under dots
     if(scene === 1){ drawNodes(Math.min(1, sceneT*2 + 0.15), true); }
-    if(scene === 6){
-      drawNodes(0.5);
-      attribLines(reduced ? 1 : Math.min(1, sceneT*1.5 + 0.1), time);
-    }
-
     // channels scene — dots shuttle channel → household hub → channel
     // (all traffic routes through the center: spokes, never chords)
     if(scene === 1 && !reduced){
@@ -1214,10 +1292,6 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
             ctx.stroke();
           }
         } else if(p.intent) col = 'rgba(255,184,92,0.28)';
-        else col = 'rgba(70,78,95,0.45)';
-      } else { // 6
-        if(p.raiser){ col = 'rgba(255,184,92,1)'; r += 0.7; }
-        else if(p.intent) col = 'rgba(255,184,92,0.4)';
         else col = 'rgba(70,78,95,0.45)';
       }
 
@@ -1328,6 +1402,161 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid #E4DCCB;font-family
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+
+  // ---- pill opens modal ----
+  document.getElementById('pill').addEventListener('click', () => {
+    document.getElementById('applyModal').classList.add('open');
+  });
+
+})();
+
+// ---- Apply Modal ----
+(function(){
+  const overlay = document.getElementById('applyModal');
+  const box = overlay.querySelector('.apply-box');
+  const cv = document.getElementById('applyCanvas');
+  const mctx = cv.getContext('2d');
+  const dots = overlay.querySelectorAll('.apply-dot');
+  const steps = overlay.querySelectorAll('.apply-step');
+  let cur = 0;
+  const NP = 120;
+  let particles = [], animating = false, animStart = 0;
+
+  function sizeCanvas(){
+    const r = box.getBoundingClientRect();
+    cv.width = r.width * 2; cv.height = r.height * 2;
+    cv.style.width = r.width + 'px'; cv.style.height = r.height + 'px';
+    mctx.setTransform(2,0,0,2,0,0);
+  }
+
+  function openModal(){
+    overlay.classList.add('open');
+    sizeCanvas();
+    goStep(0, false);
+  }
+  function closeModal(){
+    overlay.classList.remove('open');
+    setTimeout(() => goStep(0, false), 400);
+  }
+
+  function goStep(n, animate){
+    if(animating) return;
+    const prev = cur;
+    cur = n;
+    if(animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      animating = true;
+      steps[prev].style.opacity = '0';
+      steps[prev].style.transform = 'translateY(-10px)';
+      sizeCanvas();
+      const bw = box.offsetWidth, bh = box.offsetHeight;
+      particles = [];
+      for(let i=0;i<NP;i++){
+        const sx = Math.random()*bw, sy = 40 + Math.random()*(bh-80);
+        const angle = Math.random()*Math.PI*2;
+        const speed = 1.5 + Math.random()*3;
+        particles.push({
+          x:sx, y:sy,
+          vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed,
+          tx: Math.random()*bw, ty: 40 + Math.random()*(bh-80),
+          r: 1 + Math.random()*1.5, a: 0.6 + Math.random()*0.4
+        });
+      }
+      animStart = performance.now();
+      requestAnimationFrame(animFrame);
+      setTimeout(() => {
+        steps[prev].classList.remove('active');
+        steps[prev].style.opacity = ''; steps[prev].style.transform = '';
+        steps[cur].classList.add('active');
+        updateDots();
+        animating = false;
+        mctx.clearRect(0,0,cv.width,cv.height);
+      }, 600);
+    } else {
+      steps.forEach(s => { s.classList.remove('active'); s.style.opacity=''; s.style.transform=''; });
+      steps[cur].classList.add('active');
+      updateDots();
+    }
+  }
+
+  function animFrame(now){
+    if(!animating) return;
+    const elapsed = now - animStart;
+    const prog = Math.min(1, elapsed / 600);
+    const bw = box.offsetWidth, bh = box.offsetHeight;
+    mctx.clearRect(0,0,bw,bh);
+    for(const p of particles){
+      if(prog < 0.4){
+        p.x += p.vx; p.y += p.vy;
+        p.vx *= 0.97; p.vy *= 0.97;
+      } else {
+        const t = (prog - 0.4) / 0.6;
+        const ease = t*t*(3-2*t);
+        p.x += (p.tx - p.x)*ease*0.15;
+        p.y += (p.ty - p.y)*ease*0.15;
+      }
+      const fade = prog < 0.1 ? prog/0.1 : prog > 0.85 ? (1-prog)/0.15 : 1;
+      mctx.fillStyle = `rgba(255,158,27,${p.a * fade})`;
+      mctx.beginPath();
+      mctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      mctx.fill();
+    }
+    if(prog < 1) requestAnimationFrame(animFrame);
+  }
+
+  function updateDots(){
+    dots.forEach((d,i) => {
+      d.classList.toggle('active', i === cur);
+      d.classList.toggle('done', i < cur);
+    });
+  }
+
+  // chip selection
+  overlay.querySelectorAll('.apply-chips').forEach(group => {
+    group.querySelectorAll('.ac').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.ac').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+      });
+    });
+  });
+
+  // open
+  document.getElementById('openApply').addEventListener('click', openModal);
+  // close
+  document.getElementById('applyClose').addEventListener('click', closeModal);
+  overlay.querySelector('.apply-backdrop').addEventListener('click', closeModal);
+  // nav
+  document.getElementById('apNext1').addEventListener('click', () => goStep(1, true));
+  document.getElementById('apBack2').addEventListener('click', () => goStep(0, true));
+  document.getElementById('apNext2').addEventListener('click', () => {
+    const name = document.getElementById('apName').value || '(not provided)';
+    const email = document.getElementById('apEmail').value || '(not provided)';
+    const phone = document.getElementById('apPhone').value || '(not provided)';
+    const biz = document.getElementById('apBiz').value || '(not provided)';
+    const ind = document.getElementById('apInd').value || '(not provided)';
+    const web = document.getElementById('apWeb').value || '(not provided)';
+    const emp = overlay.querySelector('[data-group="emp"] .ac.sel');
+    const bud = overlay.querySelector('[data-group="bud"] .ac.sel');
+    const body = [
+      'New client application from digitalpointes.com',
+      '',
+      'Name: ' + name,
+      'Email: ' + email,
+      'Phone: ' + phone,
+      '',
+      'Company: ' + biz,
+      'Industry: ' + ind,
+      'Website: ' + web,
+      'Team size: ' + (emp ? emp.textContent : '(not selected)'),
+      'Monthly ad budget: ' + (bud ? bud.textContent : '(not selected)')
+    ].join('\n');
+    const mailto = 'mailto:steve@digitalpointes.com'
+      + '?subject=' + encodeURIComponent('New Client Application: ' + biz)
+      + '&body=' + encodeURIComponent(body);
+    window.open(mailto, '_blank');
+    goStep(2, true);
+  });
+  document.getElementById('apDone').addEventListener('click', closeModal);
 })();
 </script>
 </body>
