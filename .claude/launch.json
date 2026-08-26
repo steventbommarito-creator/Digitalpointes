@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "dp-platform",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "/Users/stevenbommarito/Documents/GitHub/dp-platform/packages/web", "dev", "-p", "3100"],
+      "port": 3100
     }
   ]
 }
